@@ -2,6 +2,8 @@ import Navbar from "../components/Navbar";
 import React from 'react'
 import { FaArrowRightLong } from "react-icons/fa6";
 import Searchbar from "../components/Searchbar";
+import CitySearch from "../components/citysearch";
+import FeaturesSection from "../components/Features";
 
 export const Home = () => {
     return (
@@ -115,7 +117,11 @@ export const Home = () => {
                         <p className="text-gray-700">Pay fair market rates from Hell's Kitchen to Hollywood</p>
                     </div>
                 </div>
+            
             </div>
+            <CitySearch/>
+            <FeaturesSection/>
+    
 
         </div>
 
