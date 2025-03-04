@@ -32,7 +32,7 @@ export const Home = () => {
                         <p className="mt-4 text-lg">
                             Furnished and unfurnished apartments
                             <br />
-                            and rooms on flexible lease terms
+                            and rooms on flexible lease terms and condition
                         </p>
                     </div>
 
