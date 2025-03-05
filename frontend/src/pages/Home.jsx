@@ -4,6 +4,8 @@ import { FaArrowRightLong } from "react-icons/fa6";
 import Searchbar from "../components/Searchbar";
 import CitySearch from "../components/citysearch";
 import FeaturesSection from "../components/Features";
+import Footer from "../components/Footer";
+import Sliderinfo from "../components/Sliderinfo";
 
 export const Home = () => {
     return (
@@ -32,7 +34,7 @@ export const Home = () => {
                         <p className="mt-4 text-lg">
                             Furnished and unfurnished apartments
                             <br />
-                            and rooms on flexible lease terms and condition
+                            and rooms on flexible lease terms.
                         </p>
                     </div>
 
@@ -119,8 +121,28 @@ export const Home = () => {
                 </div>
             
             </div>
-            <CitySearch/>
-            <FeaturesSection/>
+
+            {/* section-5 */}
+            <div>
+                <CitySearch/>
+            </div>
+
+            {/* section-6 */}
+            <div>
+                <FeaturesSection/>
+            </div>
+
+            {/* section-7 */}
+            <div>
+                <Sliderinfo/>
+            </div>
+
+            {/* section-8 */}
+            <div>
+                <Footer/>
+            </div>
+            
+            
     
 
         </div>
