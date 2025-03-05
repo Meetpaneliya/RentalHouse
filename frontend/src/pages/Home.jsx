@@ -7,14 +7,15 @@ import FeaturesSection from "../components/Features";
 import Footer from "../components/Footer";
 import Sliderinfo from "../components/Sliderinfo";
 
+
 export const Home = () => {
     return (
         <div className="w-full h-screen overflow-y-auto">
             {/* Hero Section */}
             <div
-                className="relative w-full h-screen bg-opacity-80 bg-cover"
+                className="relative w-full h-screen bg-cover"
                 style={{
-                    backgroundImage: `url('/assets/blueroom.jpg')`,
+                    backgroundImage: `url('/assets/home.jpg')`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'
                 }}
@@ -25,11 +26,11 @@ export const Home = () => {
                 </div>
 
                 {/* Overlay */}
-                <div className="absolute inset-0 bg-gray-900 opacity-50"></div>
+                <div className="absolute inset-0 bg-gray-900 opacity-30"></div>
 
                 {/* bg content-1 */}
                 <div className="absolute inset-0 z-10 flex flex-col items-center justify-center space-y-6">
-                    <div className=" text-gray-300 text-center">
+                    <div className=" text-slate-200 text-center bg-purple-700/10 rounded-3xl p-10">
                         <h2 className="text-4xl font-bold">Ready, Set, Rent.</h2>
                         <p className="mt-4 text-lg">
                             Furnished and unfurnished apartments
