@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import cloudinary from "cloudinary";
 import { connectDB } from "./lib/db.js";
 import { errorMiddleware } from "./middlewares/error.js";
+import { app, server } from "./lib/socket.js";
 
 // Load environment variables
 dotenv.config({ path: "./.env" });
@@ -24,8 +25,6 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const app = express();
-
 // Security & Middleware Setup
 app.use(
   helmet({
@@ -35,7 +34,7 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(cookieParser());
 // CORS Configuration
 const corsOptions = {
   origin: envMode === "DEVELOPMENT" ? "*" : process.env.FRONTEND_URL,
@@ -57,6 +56,10 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import kycRoutes from "./routes/kycRoutes.js";
 import favoriteRoutes from "./routes/favoriteRoutes.js";
+import chatRoutes from "./routes/ChatMessage.js";
+import cookieParser from "cookie-parser";
+import { seedUsers } from "./seed/userSeed.js";
+import { seedListings } from "./seed/listingData.js";
 
 // API Routes
 app.use("/api/v1/user", userRoutes);
@@ -65,6 +68,7 @@ app.use("/api/v1/notifications", notificationRoutes);
 app.use("/api/v1/reviews", reviewRoutes);
 app.use("/api/v1/kyc", kycRoutes);
 app.use("/api/v1/favorites", favoriteRoutes);
+app.use("/api/v1/chat", chatRoutes);
 
 // Handle 404 Errors
 app.all("*", (req, res) => {
@@ -78,7 +82,7 @@ app.all("*", (req, res) => {
 app.use(errorMiddleware);
 
 // Start Server
-app.listen(port, () =>
+server.listen(port, () =>
   console.log(`Server running on Port: ${port} in ${envMode} Mode.`)
 );
 
