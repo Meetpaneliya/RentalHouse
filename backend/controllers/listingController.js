@@ -6,7 +6,12 @@ import cloudinary from "cloudinary";
 
 // Get Listings for a Specific User
 const getUserListings = TryCatch(async (req, res, next) => {
-  const userId = req.user.id; // or req.user._id if that's how it's stored
+  const userId = req.user;
+
+  if (!userId)
+    return next(
+      new ErrorHandler(401, "Unauthorized: Please login to view your listings")
+    );
   const page = parseInt(req.query.page) || 1;
   const limit = 10;
   const skip = (page - 1) * limit;
@@ -29,12 +34,6 @@ const getUserListings = TryCatch(async (req, res, next) => {
 
 // Create a New Listing
 const createListing = TryCatch(async (req, res, next) => {
-  if (!req.user) {
-    return next(
-      new ErrorHandler(401, "Unauthorized: Please login to create a listing")
-    );
-  }
-
   const {
     title,
     description,
@@ -98,7 +97,7 @@ const createListing = TryCatch(async (req, res, next) => {
     location,
     locationGeo,
     images: imageArray,
-    owner: req.user.id,
+    owner: req.user,
     propertyType,
     amenities: amenitiesArray,
     rooms: rooms || 1,

@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { User } from "../models/user.js"; // Adjust path if needed
-
+import bcrypt from "bcryptjs"; // Adjust path if needed
 export const seedUsers = async () => {
   try {
     // Define possible roles; you have "tenant", "landlord", and "admin"
@@ -13,7 +13,7 @@ export const seedUsers = async () => {
       const name = faker.person.fullName();
       const email = faker.internet.email();
       // Use a fixed password for all seeded users
-      const password = "password";
+      const password = await bcrypt.hash("password", 10);
       // Generate a fake avatar image URL for profilePicture
       const profilePicture = faker.image.avatar();
 

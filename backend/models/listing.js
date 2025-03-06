@@ -20,7 +20,12 @@ const ListingSchema = new mongoose.Schema(
     status: { type: String, default: "available" },
     price: { type: Number, required: true },
     location: { type: String, required: true },
-    images: [{ type: String }], // Array of image URLs
+    images: [
+      {
+        public_id: { type: String, required: true },
+        url: { type: String, required: true },
+      },
+    ],
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
