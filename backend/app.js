@@ -58,6 +58,7 @@ import kycRoutes from "./routes/kycRoutes.js";
 import favoriteRoutes from "./routes/favoriteRoutes.js";
 import chatRoutes from "./routes/ChatMessage.js";
 import cookieParser from "cookie-parser";
+import paymentRoutes from "./routes/PaymentMethod.js";
 import { seedUsers } from "./seed/userSeed.js";
 import { seedListings } from "./seed/listingData.js";
 
@@ -69,6 +70,7 @@ app.use("/api/v1/reviews", reviewRoutes);
 app.use("/api/v1/kyc", kycRoutes);
 app.use("/api/v1/favorites", favoriteRoutes);
 app.use("/api/v1/chat", chatRoutes);
+app.use("/api/v1/payment", paymentRoutes);
 
 // Handle 404 Errors
 app.all("*", (req, res) => {
