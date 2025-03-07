@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaEye, FaEyeSlash, FaGoogle, FaFacebook, FaTimes } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaGoogle, FaApple, FaTimes } from "react-icons/fa";
 
 export default function LoginPage({ onClose, setShowSignupModal }) {
     const [showPassword, setShowPassword] = useState(false);
@@ -85,18 +85,19 @@ export default function LoginPage({ onClose, setShowSignupModal }) {
                 <div className="grid grid-cols-2 gap-4">
                     <button
                         className="flex items-center justify-center gap-2 p-2 border rounded-md hover:bg-gray-50"
-                        onClick={() => console.log("Google login clicked")}
+                        onClick={() => console.log("Facebook login clicked")}
                     >
-                        <FaGoogle className="text-red-500" />
-                        Google
+                        <FaApple className="text-black" />
+                        Apple
                     </button>
                     <button
                         className="flex items-center justify-center gap-2 p-2 border rounded-md hover:bg-gray-50"
-                        onClick={() => console.log("Facebook login clicked")}
+                        onClick={() => console.log("Google login clicked")}
                     >
-                        <FaFacebook className="text-blue-600" />
-                        Facebook
+                        <FaGoogle className="text-blue-600" />
+                        Google
                     </button>
+
                 </div>
 
                 <div className="relative">
@@ -120,9 +121,8 @@ export default function LoginPage({ onClose, setShowSignupModal }) {
                             placeholder="john.doe@example.com"
                             value={formData.email}
                             onChange={handleInputChange}
-                            className={`mt-1 block w-full rounded-md border ${
-                                errors.email ? "border-red-500" : "border-gray-300"
-                            } px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                            className={`mt-1 block w-full rounded-md border ${errors.email ? "border-red-500" : "border-gray-300"
+                                } px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
                         />
                         {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
                     </div>
@@ -137,9 +137,8 @@ export default function LoginPage({ onClose, setShowSignupModal }) {
                             placeholder="••••••••"
                             value={formData.password}
                             onChange={handleInputChange}
-                            className={`block w-full rounded-md border ${
-                                errors.password ? "border-red-500" : "border-gray-300"
-                            } px-3 py-2 pr-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                            className={`block w-full rounded-md border ${errors.password ? "border-red-500" : "border-gray-300"
+                                } px-3 py-2 pr-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
                         />
                         <button
                             type="button"

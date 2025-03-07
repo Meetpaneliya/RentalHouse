@@ -1,6 +1,5 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
-import { FaEye, FaEyeSlash, FaGoogle, FaFacebook, FaTimes } from "react-icons/fa"
+import { FaEye, FaEyeSlash, FaApple, FaGoogle, FaTimes } from "react-icons/fa"
 
 export default function SignupPage({ onClose, setShowLoginModal }) {
     const [showPassword, setShowPassword] = useState(false)
@@ -98,15 +97,15 @@ export default function SignupPage({ onClose, setShowLoginModal }) {
                         className="flex items-center justify-center gap-2 p-2 border rounded-md hover:bg-gray-50"
                         onClick={() => console.log("Google signup clicked")}
                     >
-                        <FaGoogle className="text-red-500" />
-                        Google
+                        <FaApple className="text-black" />
+                        Apple
                     </button>
                     <button 
                         className="flex items-center justify-center gap-2 p-2 border rounded-md hover:bg-gray-50"
                         onClick={() => console.log("Facebook signup clicked")}
                     >
-                        <FaFacebook className="text-blue-600" />
-                        Facebook
+                        <FaGoogle className="text-blue-600" />
+                        Google
                     </button>
                 </div>
 
