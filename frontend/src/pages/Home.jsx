@@ -1,14 +1,18 @@
 import Navbar from "../components/Navbar";
-import React from 'react'
+import React, { useState } from 'react';  // Add useState import
 import { FaArrowRightLong } from "react-icons/fa6";
 import Searchbar from "../components/Searchbar";
 import CitySearch from "../components/citysearch";
 import FeaturesSection from "../components/Features";
 import Footer from "../components/Footer";
 import Sliderinfo from "../components/Sliderinfo";
+import LoginPage from "./Login";
+import SignupPage from "./Register";
 
 
 export const Home = () => {
+    const [showLoginModal, setShowLoginModal] = useState(false);
+    const [showSignupModal, setShowSignupModal] = useState(false);
     return (
         <div className="w-full h-screen overflow-y-auto">
             {/* Hero Section */}
@@ -22,7 +26,10 @@ export const Home = () => {
             >
                 {/* Navbar - positioned at top */}
                 <div className="absolute top-0 left-0 right-0 z-20">
-                    <Navbar />
+                    <Navbar 
+                        setShowLoginModal={setShowLoginModal}
+                        setShowSignupModal={setShowSignupModal}
+                    />
                 </div>
 
                 {/* Overlay */}
@@ -122,6 +129,41 @@ export const Home = () => {
                 </div>
             
             </div>
+
+            {/* Modal Overlays */}
+            {(showLoginModal || showSignupModal) && (
+                <div 
+                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+                    onClick={() => {
+                        setShowLoginModal(false);
+                        setShowSignupModal(false);
+                    }}
+                />
+            )}
+            
+            {/* Login Modal */}
+            {showLoginModal && (
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div onClick={e => e.stopPropagation()}>
+                        <LoginPage 
+                            onClose={() => setShowLoginModal(false)}
+                            setShowSignupModal={setShowSignupModal}
+                        />
+                    </div>
+                </div>
+            )}
+            
+            {/* Signup Modal */}
+            {showSignupModal && (
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div onClick={e => e.stopPropagation()}>
+                        <SignupPage 
+                            onClose={() => setShowSignupModal(false)}
+                            setShowLoginModal={setShowLoginModal}
+                        />
+                    </div>
+                </div>
+            )}
 
             {/* section-5 */}
             <div>

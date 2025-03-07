@@ -17,10 +17,8 @@ const Footer = () => {
                                 <li>Rooms</li>
                                 <li>Furnished Apartments</li>
                                 <li>Studios</li>
-                                <li>Manhattan</li>
                                 <li>Brooklyn</li>
-                                <li>Queens</li>
-                                <li>NY Student Housing</li>
+                        
                             </ul>
                         </div>
 
@@ -86,7 +84,6 @@ const Footer = () => {
                                 <li>About us</li>
                                 <li>How it works</li>
                                 <li>Careers</li>
-                                <li>Press</li>
                                 <li>Blog</li>
                                 <li>Sitemap</li>
                                 <li>Reviews</li>
