@@ -8,8 +8,8 @@ import { sendToken } from "../utils/features.js";
 
 // Register User
 const registerUser = TryCatch(async (req, res, next) => {
-  const { name, email, password, role } = req.body;
-  const profilePicture = req.file;
+  const { name, email, password } = req.body;
+  // const profilePicture = req.file;
 
   if (!name || !email || !password) {
     return next(new ErrorHandler(400, "All fields are required"));

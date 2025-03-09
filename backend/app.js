@@ -37,7 +37,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 // CORS Configuration
 const corsOptions = {
-  origin: envMode === "DEVELOPMENT" ? "*" : process.env.FRONTEND_URL,
+  origin:
+    envMode === "DEVELOPMENT"
+      ? "http://localhost:5173"
+      : process.env.FRONTEND_URL,
   credentials: true,
 };
 app.use(cors(corsOptions));
@@ -59,8 +62,7 @@ import favoriteRoutes from "./routes/favoriteRoutes.js";
 import chatRoutes from "./routes/ChatMessage.js";
 import cookieParser from "cookie-parser";
 import paymentRoutes from "./routes/PaymentMethod.js";
-import { seedUsers } from "./seed/userSeed.js";
-import { seedListings } from "./seed/listingData.js";
+import adminRoutes from "./routes/Admin.js";
 
 // API Routes
 app.use("/api/v1/user", userRoutes);
@@ -71,6 +73,7 @@ app.use("/api/v1/kyc", kycRoutes);
 app.use("/api/v1/favorites", favoriteRoutes);
 app.use("/api/v1/chat", chatRoutes);
 app.use("/api/v1/payment", paymentRoutes);
+app.use("/api/v1/admin", adminRoutes);
 
 // Handle 404 Errors
 app.all("*", (req, res) => {
