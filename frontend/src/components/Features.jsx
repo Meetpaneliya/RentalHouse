@@ -7,7 +7,7 @@ export default function FeaturesSection() {
       {/* Left Side: Image with Overlay */}
       <div className="relative w-full md:w-1/2">
         {/* Image */}
-        <img src="/assets/picture.jpg" alt="Trust and Safety" className="w-full rounded-lg shadow-lg" />
+        <img src="/assets/family.jpg" alt="Trust and Safety" className="w-full rounded-lg shadow-lg" />
         {/* Badge */}
         <div className="absolute top-4 right-4 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
           June Approved

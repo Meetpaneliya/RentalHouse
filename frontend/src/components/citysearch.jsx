@@ -2,16 +2,16 @@ import React from "react";
 
 
 const cities = [
-  { name: "New York", image: "/assets/city9.jpg" },
-  { name: "Boston", image: "/assets/city5.jpg" },
-  { name: "Washington DC", image: "/assets/city8.jpg" },
+  { name: "New York", image: "/assets/city1.jpg" },
+  { name: "Boston", image: "/assets/city2.jpg" },
+  { name: "Washington DC", image: "/assets/city3.jpg" },
   { name: "Austin", image: "/assets/city4.jpg" },
-  { name: "Chicago", image: "/assets/city1.jpg" },
-  { name: "Los Angeles", image: "/assets/city11.jpg" },
-  { name: "San Francisco", image: "/assets/city10.jpg" },
-  { name: "San Diego", image: "/assets/city.jpg" },
-  { name: "Dallas", image: "/assets/city3.jpg" },
-  { name: "Jersey City", image: "/assets/city6.jpg" },
+  { name: "Chicago", image: "/assets/city5.jpg" },
+  { name: "Los Angeles", image: "/assets/city6.jpg" },
+  { name: "San Francisco", image: "/assets/city7.jpg" },
+  { name: "San Diego", image: "/assets/city8.jpg" },
+  { name: "Dallas", image: "/assets/city9.jpg" },
+  { name: "Jersey City", image: "/assets/city10.jpg" },
 ];
 
 export default function CitySearch() {
