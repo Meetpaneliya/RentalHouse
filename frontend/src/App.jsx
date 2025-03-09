@@ -5,6 +5,7 @@ import SignupPage from './pages/Register'
 import LoginPage from './pages/Login'
 import './index.css'
 import Rooms from './pages/Rooms'
+import Listings from './pages/Listings'
 
 function App() {
   const [showLoginModal, setShowLoginModal] = useState(false)
@@ -29,6 +30,7 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path='/Room' element={<Rooms />} />
+          <Route path="/listings" element={<Listings/>}/>
         </Routes>
 
         {/* Modal Overlays */}
