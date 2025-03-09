@@ -19,7 +19,7 @@ export const Home = () => {
             <div
                 className="relative w-full h-screen bg-cover"
                 style={{
-                    backgroundImage: `url('/assets/home.jpg')`,
+                    backgroundImage: `url('/assets/room1.jpg')`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'
                 }}
