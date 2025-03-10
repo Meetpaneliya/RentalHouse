@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { FaEye, FaEyeSlash, FaApple, FaGoogle, FaTimes } from "react-icons/fa";
-import { useUserRegisterMutation } from "../redux/APi/api";
-import { useAsyncMutation } from "../hooks/useError";
+import { server } from "../lib/config";
+import toast from "react-hot-toast";
+import axios from "axios";
+import { login } from "../redux/reducers/Auth";
+import { useDispatch } from "react-redux";
 
 export default function SignupPage({ onClose, setShowLoginModal }) {
   const [showPassword, setShowPassword] = useState(false);
-
-  const [registion, isLoading] = useAsyncMutation(useUserRegisterMutation);
+  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -70,11 +73,29 @@ export default function SignupPage({ onClose, setShowLoginModal }) {
     e.preventDefault();
 
     if (validateForm()) {
-      // Here you would typically send the data to your backend
-      await registion("User Registered Successfully", formData);
-      console.log("Form submitted:", formData);
-      // For demo purposes, show an alert
-      alert("Signup successful! You can now login.");
+      const toastId = toast.loading("Signing up...");
+      setIsLoading(true);
+      const config = {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+      try {
+        const { data } = await axios.post(
+          `${server}/api/v1/user/register`,
+          formData,
+          config
+        );
+        dispatch(login(data.user));
+        toast.success(data.message, { id: toastId });
+      } catch (error) {
+        toast.error(error?.response?.data?.message || "something went wrong", {
+          id: toastId,
+        });
+      } finally {
+        setIsLoading(false);
+      }
       onClose();
     }
   };

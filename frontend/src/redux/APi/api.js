@@ -18,11 +18,11 @@ export const api = createApi({
       }),
     }),
     userlogin: builder.mutation({
-      method: "POST",
-
-      query: () => ({
+      query: (body) => ({
+        method: "POST",
         url: `user/login`,
         credentials: "include",
+        body: body,
       }),
     }),
     myProfile: builder.query({

@@ -5,6 +5,7 @@ import ErrorHandler from "../utils/errorHandler.js";
 import jwt from "jsonwebtoken";
 import { uploadFilesToCloudinary } from "../lib/helpers.js";
 import { sendToken } from "../utils/features.js";
+import { compare } from "bcryptjs";
 
 // Register User
 const registerUser = TryCatch(async (req, res, next) => {
@@ -20,23 +21,10 @@ const registerUser = TryCatch(async (req, res, next) => {
     return next(new ErrorHandler(400, "User already exists"));
   }
 
-  let avatar = null;
-
-  // Upload image only if provided
-  if (profilePicture) {
-    const result = await uploadFilesToCloudinary([profilePicture]);
-    avatar = {
-      public_id: result[0].public_id,
-      url: result[0].url,
-    };
-  }
-
   user = await User.create({
     name,
     email,
     password,
-    role,
-    profilePicture: avatar,
   });
 
   sendToken(res, user, 201, "User registered successfully");
@@ -50,20 +38,20 @@ const loginUser = TryCatch(async (req, res, next) => {
     return next(new ErrorHandler(400, "Please enter email & password"));
 
   const user = await User.findOne({ email }).select("+password");
-  console.log("Stored Hashed Password:", user.password);
 
   if (!user) return next(new ErrorHandler(404, "Invalid email or password"));
 
-  const isMatch = await user.matchPassword(password);
+  const isMatch = await compare(password, user.password);
   if (!isMatch) return next(new ErrorHandler(401, "Invalid email or password"));
 
-  sendToken(res, user, 200, "User logged in successfully");
+  sendToken(res, user, 200, `Logged in successfully as ${email}`);
 });
 
 // Get Logged-in User
 const getMe = TryCatch(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
-  res.status(200).json({ success: true, user });
+  const user = await User.findById(req.user).select("-password");
+  if (!user) return next(new ErrorHandler(404, "User not found"));
+  return res.status(200).json({ success: true, user });
 });
 
 // Update User
@@ -71,13 +59,17 @@ const updateUser = TryCatch(async (req, res, next) => {
   const user = await User.findByIdAndUpdate(req.user.id, req.body, {
     new: true,
   });
-  res.status(200).json({ success: true, message: "Profile updated", user });
+  return res
+    .status(200)
+    .json({ success: true, message: "Profile updated", user });
 });
 
 // Delete User
 const deleteUser = TryCatch(async (req, res, next) => {
   await User.findByIdAndDelete(req.user.id);
-  res.status(200).json({ success: true, message: "User deleted successfully" });
+  return res
+    .status(200)
+    .json({ success: true, message: "User deleted successfully" });
 });
 
 // Forgot Password
@@ -134,7 +126,7 @@ const resetPassword = TryCatch(async (req, res, next) => {
   user.resetPasswordExpire = undefined;
   await user.save();
 
-  res
+  return res
     .status(200)
     .json({ success: true, message: "Password reset successfully" });
 });
