@@ -45,3 +45,11 @@ export const socketAuthenticate = async (err, socket, next) => {
     return next(new ErrorHandler("please Login to access this Route", 401));
   }
 };
+
+export const admin = (req, res, next) => {
+  // Check if req.user exists and if the user's role is "admin"
+  if (req.user.role != "admin") {
+    return next(new ErrorHandler(403, "Not authorized as admin"));
+  }
+  next();
+};

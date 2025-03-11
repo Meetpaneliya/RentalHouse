@@ -1,37 +1,26 @@
 import { KYC } from "../models/KYC.js";
 import { TryCatch } from "../middlewares/error.js";
-import axios from "axios";
+
 import { configDotenv } from "dotenv";
+import ErrorHandler from "../utils/errorHandler.js";
+import { uploadFilesToCloudinary } from "../lib/helpers.js";
+
 configDotenv();
 
-const onfidoClient = axios.create({
-  baseURL: process.env.ONFIDO_BASEURL,
-  headers: {
-    Authorization: `Token token=${process.env.ONFIDO_TOKEN}`,
-    "Content-Type": "application/json",
-  },
-});
-
 const createApplication = TryCatch(async (req, res, next) => {
-  const { firstName, lastName, email, documentType, documentURL } = req.body;
+  // Extract common fields from req.body
+  const { verificationType, ssn, passportNumber } = req.body;
+  const userId = req.user; // ensure req.user is set by auth middleware
 
-  const userId = req.user && req.user.id;
   if (!userId) {
-    return next(new ErrorHandler(401, "Unauthorized: Please login"));
+    return next(new ErrorHandler(401, "Unauthorized: Please log in"));
   }
 
-  if (!firstName || !lastName || !email) {
-    return next(
-      new ErrorHandler(400, "First name, last name, and email are required")
-    );
+  if (!verificationType || !["ssn", "passport"].includes(verificationType)) {
+    return next(new ErrorHandler(400, "Invalid verification type"));
   }
 
-  if (!documentType || !documentURL) {
-    return next(
-      new ErrorHandler(400, "Document type and document URL are required")
-    );
-  }
-
+  // Check if a KYC record already exists for the user
   const existingKYC = await KYC.findOne({ user: userId });
   if (existingKYC) {
     return res
@@ -39,34 +28,69 @@ const createApplication = TryCatch(async (req, res, next) => {
       .json({ success: false, message: "KYC already submitted" });
   }
 
-  const applicationData = {
-    first_name: firstName,
-    last_name: lastName,
-    email,
-  };
+  // For SSN verification: ensure ssn is provided.
+  if (verificationType === "ssn") {
+    if (!ssn) {
+      return next(
+        new ErrorHandler(400, "SSN is required for SSN verification")
+      );
+    }
 
-  const onfidoResponse = await onfidoClient.post(
-    "/applications",
-    applicationData
-  );
+    // Create the KYC record for SSN verification.
+    const kyc = await KYC.create({
+      user: userId,
+      verificationType,
+      ssn,
+    });
 
-  const kyc = await KYC.create({
-    user: userId,
-    documentType,
-    documentURL,
-  });
+    return res
+      .status(201)
+      .json({ success: true, message: "KYC submitted successfully", kyc });
+  }
 
-  res.status(201).json({
-    success: true,
-    message: "KYC document uploaded",
-    onfidoResponse,
-    kyc,
-  });
+  // For Passport verification: ensure passportNumber and file uploads are provided.
+  if (verificationType === "passport") {
+    if (!passportNumber) {
+      return next(new ErrorHandler(400, "Passport number is required"));
+    }
+
+    // Expect file uploads with keys "passportDoc" and "visaDoc"
+    if (!req.files || !req.files.passportDoc || !req.files.visaDoc) {
+      return next(
+        new ErrorHandler(400, "Both passport and visa documents are required")
+      );
+    }
+
+    // Upload files to Cloudinary (assuming uploadFilesToCloudinary can handle an array of files)
+    const passportUpload = await uploadFilesToCloudinary(req.files.passportDoc);
+    const visaUpload = await uploadFilesToCloudinary(req.files.visaDoc);
+
+    // Assume our helper returns an array and we take the first element's URL
+    const passportDocumentURL = passportUpload[0]?.url;
+    const visaDocumentURL = visaUpload[0]?.url;
+
+    if (!passportDocumentURL || !visaDocumentURL) {
+      return next(new ErrorHandler(500, "File upload failed"));
+    }
+
+    // Create the KYC record for Passport verification.
+    const kyc = await KYC.create({
+      user: userId,
+      verificationType,
+      passportNumber,
+      passportDocument: passportDocumentURL,
+      visaDocument: visaDocumentURL,
+    });
+
+    return res
+      .status(201)
+      .json({ success: true, message: "KYC submitted successfully", kyc });
+  }
 });
 
 // Get KYC status for a user
 const getKYCStatus = TryCatch(async (req, res, next) => {
-  const userId = req.user.id;
+  const userId = req.user;
   const kyc = await KYC.findOne({ user: userId });
 
   if (!kyc)
@@ -79,7 +103,7 @@ const getKYCStatus = TryCatch(async (req, res, next) => {
 
 // Admin verifies KYC
 const verifyKYC = TryCatch(async (req, res, next) => {
-  const { userId, status } = req.body; // Only Admin can update status
+  const { status } = req.body;
 
   if (!["Pending", "Verified", "Rejected"].includes(status)) {
     return res
@@ -88,7 +112,7 @@ const verifyKYC = TryCatch(async (req, res, next) => {
   }
 
   const updatedKYC = await KYC.findOneAndUpdate(
-    { user: userId },
+    { user: req.user },
     { status },
     { new: true }
   );

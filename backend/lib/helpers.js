@@ -1,6 +1,6 @@
-//upload to cloudinary server
 import { v2 as cloudinary } from "cloudinary";
 import { v4 as uuid } from "uuid";
+
 const getBase64 = (file) =>
   `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
 
@@ -9,13 +9,16 @@ const uploadFilesToCloudinary = async (files = []) => {
     return new Promise((resolve, reject) => {
       if (file.size > 1024 * 1024 * 5) {
         // Limit file size to 5MB
-        reject(new Error("File size is too large"));
+        return reject(new Error("File size is too large"));
       }
       cloudinary.uploader.upload(
         getBase64(file),
         { resource_type: "auto", public_id: uuid(), type: "upload" },
         (error, result) => {
-          if (error) return reject(error);
+          if (error) {
+            console.error("Cloudinary upload error:", error);
+            return reject(error);
+          }
           resolve(result);
         }
       );
@@ -30,7 +33,7 @@ const uploadFilesToCloudinary = async (files = []) => {
     }));
     return formattedResult;
   } catch (error) {
-    throw new Error("Error uploading files", error);
+    throw new Error(`Error uploading files: ${error.message}`);
   }
 };
 

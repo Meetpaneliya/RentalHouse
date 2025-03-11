@@ -4,6 +4,7 @@ import { TryCatch } from "../middlewares/error.js";
 import { config } from "dotenv";
 import paypal from "paypal-rest-sdk";
 import ErrorHandler from "../utils/errorHandler.js";
+import { validateWebhookSignature } from "razorpay/dist/utils/razorpay-utils.js";
 
 config(); // Load environment variables
 
@@ -112,6 +113,24 @@ const createPayPalPayment = TryCatch(async (req, res, next) => {
   });
 });
 
+// verify section
+
+const verifyRazorpayPayment = TryCatch(async (req, res, next) => {
+  const { orderId, paymentId, signature } = req.body;
+
+  const secret = process.env.RAZOR_SECRET;
+  const body = orderId + "|" + paymentId;
+  const isValidSignature = validateWebhookSignature(body, signature, secret);
+
+  if (isValidSignature) {
+    console.log("Razorpay Payment Verification Success");
+    return res.status(200).json({ success: true, message: "Payment verified" });
+  } else {
+    console.log("Razorpay Payment Verification Failed");
+    return next(new ErrorHandler(400, "Payment verification failed"));
+  }
+});
+
 const verifyPaymentSuccess = TryCatch(async (req, res, next) => {
   const { paymentId, PayerID } = req.query;
   const execute_payment_json = {
@@ -147,4 +166,5 @@ export {
   createPayPalPayment,
   verifyPaymentSuccess,
   verifyPaymentCancel,
+  verifyRazorpayPayment,
 };
