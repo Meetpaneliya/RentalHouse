@@ -1,8 +1,7 @@
 // userController.js
 import { User } from "../models/user.js";
-import { TryCatch, errorMiddleware } from "../middlewares/error.js";
+import { TryCatch } from "../middlewares/error.js";
 import ErrorHandler from "../utils/errorHandler.js";
-import { uploadFilesToCloudinary } from "../lib/helpers.js";
 import { sendToken } from "../utils/features.js";
 import { compare } from "bcryptjs";
 
@@ -38,20 +37,11 @@ const loginUser = TryCatch(async (req, res, next) => {
     return next(new ErrorHandler(400, "Please enter email & password"));
 
   const user = await User.findOne({ email }).select("+password");
-<<<<<<< HEAD
-
-  if (!user) return next(new ErrorHandler(404, "Invalid User"));
-  console.log("Stored Hashed Password:", user.password);
-
-  const isMatch = await user.matchPassword(password);
-  if (!isMatch) return next(new ErrorHandler(401, "Invalid password"));
-=======
 
   if (!user) return next(new ErrorHandler(404, "Invalid email or password"));
 
   const isMatch = await compare(password, user.password);
   if (!isMatch) return next(new ErrorHandler(401, "Invalid email or password"));
->>>>>>> e9658aed19a83818d45a09086ca8bf59eb64f500
 
   sendToken(res, user, 200, `Logged in successfully as ${email}`);
 });

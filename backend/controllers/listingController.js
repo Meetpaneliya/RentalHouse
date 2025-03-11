@@ -5,6 +5,7 @@ import ErrorHandler from "../utils/errorHandler.js";
 import cloudinary from "cloudinary";
 import mongoose from "mongoose";
 
+
 // Get Listings for a Specific User
 const getUserListings = TryCatch(async (req, res, next) => {
   console.log("req.user:", req.user); 
@@ -37,6 +38,17 @@ const getUserListings = TryCatch(async (req, res, next) => {
   }
 
   res.status(200).json({ success: true, page, totalListings, listings });
+});
+
+// Get All Listings
+const getAllListings = TryCatch(async (req, res) => {
+  try {
+    const listings = await Listing.find({}); // Fetch all listings from the database
+    console.log("listings : ", listings);
+    res.status(200).json({ success: true, count: listings.length, data: listings });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to retrieve listings", error: error.message });
+  }
 });
 
 // Create a New Listing
@@ -270,6 +282,7 @@ const deleteListing = TryCatch(async (req, res, next) => {
 
 export {
   getUserListings,
+  getAllListings,
   createListing,
   updateListing,
   deleteListing,

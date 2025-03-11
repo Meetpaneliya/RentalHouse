@@ -22,7 +22,7 @@ const Listings = () => {
     const fetchListings = async () => {
       try {
         console.log("Fetching listings...");
-        const response = await axios.get("http://localhost:4000/api/v1/listings/get", {
+        const response = await axios.get("http://localhost:4000/api/v1/listings/all-listings", {
           withCredentials: true,
         });
 

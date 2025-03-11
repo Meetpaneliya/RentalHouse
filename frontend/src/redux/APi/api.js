@@ -31,6 +31,12 @@ export const api = createApi({
         credentials: "include",
       }),
     }),
+    allListings: builder.query({
+      query: () => ({
+        url: `user/all-listings`,
+        credentials: "include"  
+      }),
+    }),
   }),
 });
 
@@ -38,4 +44,5 @@ export const {
   useUserRegisterMutation,
   useUserloginMutation,
   useMyProfileQuery,
+  useAllListingsQuery,
 } = api;
