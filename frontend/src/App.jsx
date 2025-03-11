@@ -10,6 +10,8 @@ import { server } from "./lib/config";
 import Listings from "./pages/Listings";
 import { useDispatch, useSelector } from "react-redux";
 import { login, logout } from "./redux/reducers/Auth";
+import AboutUs from "./components/AboutUs";
+import ContactUs from "./components/ContactUs";
 
 import { Toaster } from "react-hot-toast";
 
@@ -62,6 +64,8 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/Room" element={<Rooms />} />
           <Route path="/listings" element={<Listings />} />
+          <Route path="/about" element={<AboutUs/>}/>
+          <Route path="/contact" element={<ContactUs/>}/>
         </Routes>
 
         {/* Modal Overlays */}
