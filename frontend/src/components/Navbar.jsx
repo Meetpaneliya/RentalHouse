@@ -7,7 +7,7 @@ const Navbar = ({ setShowLoginModal, setShowSignupModal }) => {
             <Link to="/" className="text-2xl font-semibold text-slate-200">June</Link>
             <nav className="space-x-16">
                 <Link to="/about" className="text-slate-200 font-semibold hover:text-gray-400">About</Link>
-                <Link to="/cities" className="text-slate-200 font-semibold hover:text-gray-400">Cities</Link>
+                <Link to="/listings" className="text-slate-200 font-semibold hover:text-gray-400">Cities</Link>
                 <Link to="/contact" className="text-slate-200 font-semibold hover:text-gray-400">Contact</Link>
                 
                 <button 

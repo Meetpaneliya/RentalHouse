@@ -2,17 +2,17 @@ import React from "react";
 
 const Footer = () => {
     return (
-        <footer className="bg-[#0b0b45] text-white py-12 px-8">
+        <footer className="bg-[#0b0b45] text-white py-7 px-8">
             <div className="flex justify-between items-center max-w-8xl mt-40">
                 <div className="flex flex-col w-4/12 ml-10 ">
-                    <h2 className="text-lg font-semibold mb-2">June Homes provides apartments and rooms for rent in major US cities on flexible lease terms.</h2>
+                    <h2 className="text-2xl font-semibold mb-2">June Homes provides apartments and rooms for rent in major US cities on flexible lease terms.</h2>
                     <img src="/assets/notpen.png" alt="Checklist" className="" />
                 </div>
 
                 <div className="flex flex-col w-6/12 space-y-10">
                     <div className="flex justify-between">
                         <div>
-                            <h3 className="text-lg font-semibold mb-2">New York, NY</h3>
+                            <h3 className="text-xl font-semibold mb-2">New York, NY</h3>
                             <ul className="space-y-1 text-sm">
                                 <li>Rooms</li>
                                 <li>Furnished Apartments</li>
@@ -23,7 +23,7 @@ const Footer = () => {
                         </div>
 
                         <div>
-                            <h3 className="text-lg font-semibold mb-2">Washington, D.C.</h3>
+                            <h3 className="text-xl font-semibold mb-2">Washington, D.C.</h3>
                             <ul className="space-y-1 text-sm">
                                 <li>Rooms</li>
                                 <li>Apartments</li>
@@ -33,7 +33,7 @@ const Footer = () => {
                         </div>
 
                         <div>
-                            <h3 className="text-lg font-semibold mb-2">Boston, MA</h3>
+                            <h3 className="text-xl font-semibold mb-2">Boston, MA</h3>
                             <ul className="space-y-1 text-sm">
                                 <li>Rooms</li>
                                 <li>Apartments</li>
@@ -43,7 +43,7 @@ const Footer = () => {
                         </div>
 
                         <div>
-                            <h3 className="text-lg font-semibold mb-2">Chicago, IL</h3>
+                            <h3 className="text-xl font-semibold mb-2">Chicago, IL</h3>
                             <ul className="space-y-1 text-sm">
                                 <li>Rooms</li>
                                 <li>Apartments</li>
@@ -55,7 +55,7 @@ const Footer = () => {
 
                     <div className="flex justify-between">
                         <div>
-                            <h3 className="text-lg font-semibold mb-2">Other cities</h3>
+                            <h3 className="text-xl font-semibold mb-2">Other cities</h3>
                             <ul className="space-y-1 text-sm">
                                 <li>Austin</li>
                                 <li>Los Angeles</li>
@@ -67,7 +67,7 @@ const Footer = () => {
                         </div>
 
                         <div>
-                            <h3 className="text-lg font-semibold mb-2">Housing</h3>
+                            <h3 className="text-xl font-semibold mb-2">Housing</h3>
                             <ul className="space-y-1 text-sm">
                                 <li>Military Housing</li>
                                 <li>Travel Nurse Housing</li>
@@ -79,7 +79,7 @@ const Footer = () => {
                         </div>
 
                         <div>
-                            <h3 className="text-lg font-semibold mb-2">Company</h3>
+                            <h3 className="text-xl font-semibold mb-2">Company</h3>
                             <ul className="space-y-1 text-sm">
                                 <li>About us</li>
                                 <li>How it works</li>
@@ -91,7 +91,7 @@ const Footer = () => {
                         </div>
 
                         <div>
-                            <h3 className="text-lg font-semibold mb-2">Other</h3>
+                            <h3 className="text-xl font-semibold mb-2">Other</h3>
                             <ul className="space-y-1 text-sm">
                                 <li>Terms of Use</li>
                                 <li>Cookie Policy</li>

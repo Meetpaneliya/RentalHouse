@@ -7,12 +7,13 @@ import cloudinary from "cloudinary";
 import { connectDB } from "./lib/db.js";
 import { errorMiddleware } from "./middlewares/error.js";
 import { app, server } from "./lib/socket.js";
+import cookieParser from "cookie-parser";
 
 // Load environment variables
 dotenv.config({ path: "./.env" });
 
 export const envMode = process.env.NODE_ENV || "DEVELOPMENT";
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 4000;
 const mongoURI = process.env.MONGO_URI || "mongodb://localhost:27017";
 
 // Connect to MongoDB
@@ -35,42 +36,31 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
 // CORS Configuration
 const corsOptions = {
-  origin: envMode === "DEVELOPMENT" ? "*" : process.env.FRONTEND_URL,
+  origin:"http://localhost:5173",
   credentials: true,
 };
 app.use(cors(corsOptions));
 
 app.use(morgan("dev"));
 
-// Default Route
-app.get("/", (req, res) => {
-  res.send("Hello, World!");
-});
-
 // Import Routes
 import userRoutes from "./routes/userRoutes.js";
 import listingRoutes from "./routes/listingRoutes.js";
-import notificationRoutes from "./routes/notificationRoutes.js";
-import reviewRoutes from "./routes/reviewRoutes.js";
-import kycRoutes from "./routes/kycRoutes.js";
-import favoriteRoutes from "./routes/favoriteRoutes.js";
-import chatRoutes from "./routes/ChatMessage.js";
-import cookieParser from "cookie-parser";
-import paymentRoutes from "./routes/PaymentMethod.js";
-import { seedUsers } from "./seed/userSeed.js";
-import { seedListings } from "./seed/listingData.js";
+
+// Error Middleware
+app.use(errorMiddleware);
 
 // API Routes
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/listings", listingRoutes);
-app.use("/api/v1/notifications", notificationRoutes);
-app.use("/api/v1/reviews", reviewRoutes);
-app.use("/api/v1/kyc", kycRoutes);
-app.use("/api/v1/favorites", favoriteRoutes);
-app.use("/api/v1/chat", chatRoutes);
-app.use("/api/v1/payment", paymentRoutes);
+
+// Default Route
+app.get("/", (req, res) => {
+  res.send("Hello, World!");
+});
 
 // Handle 404 Errors
 app.all("*", (req, res) => {
@@ -79,9 +69,6 @@ app.all("*", (req, res) => {
     message: "Page not found",
   });
 });
-
-// Error Middleware
-app.use(errorMiddleware);
 
 // Start Server
 server.listen(port, () =>

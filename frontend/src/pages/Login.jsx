@@ -7,10 +7,13 @@ export default function LoginPage({ onClose, setShowSignupModal }) {
         email: "",
         password: "",
     });
+    
     const [errors, setErrors] = useState({
         email: "",
         password: "",
     });
+    const [loading, setLoading] = useState(false);
+    const [apiError, setApiError] = useState("");
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -52,21 +55,52 @@ export default function LoginPage({ onClose, setShowSignupModal }) {
         return valid;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (validateForm()) {
-            // Here you would typically send the data to your backend
-            console.log("Form submitted:", formData);
-            // For demo purposes, show an alert
+        if (!validateForm()) return;
+
+        setLoading(true);
+        setApiError("");
+
+        try {
+
+            const response = await fetch("http://localhost:4000/api/v1/user/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify(formData),
+            });
+
+            console.log("Raw response:", response);
+
+            const data = await response.json();
+            console.log("Response data:", data);
+
+            if (!response.ok) {
+                throw new Error(data.message || "Login failed");
+            }
+
+            localStorage.setItem("token", data.token);
+            console.log("Login successful! Token:", data.token);
+
             alert("Login successful!");
             onClose();
+
+        } catch (error) {
+            console.error("Login error:", error);
+            setApiError(error.message || "Login failed");
+        } finally {
+            setLoading(false);
         }
     };
 
+
     return (
         <div className="w-96 max-w-3xl bg-white rounded-lg shadow-xl p-9 relative animate-fadeIn">
-            {/* Add close button */}
+            {/* Close Button */}
             <button
                 onClick={onClose}
                 className="absolute right-4 top-4 text-gray-500 hover:text-gray-700 transition-colors"
@@ -83,21 +117,14 @@ export default function LoginPage({ onClose, setShowSignupModal }) {
             <div className="space-y-4">
                 {/* Social Login Buttons */}
                 <div className="grid grid-cols-2 gap-4">
-                    <button
-                        className="flex items-center justify-center gap-2 p-2 border rounded-md hover:bg-gray-50"
-                        onClick={() => console.log("Facebook login clicked")}
-                    >
+                    <button className="flex items-center justify-center gap-2 p-2 border rounded-md hover:bg-gray-50">
                         <FaApple className="text-black" />
                         Apple
                     </button>
-                    <button
-                        className="flex items-center justify-center gap-2 p-2 border rounded-md hover:bg-gray-50"
-                        onClick={() => console.log("Google login clicked")}
-                    >
+                    <button className="flex items-center justify-center gap-2 p-2 border rounded-md hover:bg-gray-50">
                         <FaGoogle className="text-blue-600" />
                         Google
                     </button>
-
                 </div>
 
                 <div className="relative">
@@ -108,6 +135,8 @@ export default function LoginPage({ onClose, setShowSignupModal }) {
                         <span className="px-2 bg-white text-gray-500">Or continue with</span>
                     </div>
                 </div>
+
+                {apiError && <p className="text-xs text-red-500">{apiError}</p>}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
@@ -149,29 +178,23 @@ export default function LoginPage({ onClose, setShowSignupModal }) {
                         </button>
                     </div>
                     {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password}</p>}
+
                     <div className="flex items-center justify-between">
                         <div className="flex items-center">
-                            <input
-                                id="remember-me"
-                                name="remember-me"
-                                type="checkbox"
-                                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                            />
-                            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                                Remember me
-                            </label>
+                            <input id="remember-me" name="remember-me" type="checkbox" className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">Remember me</label>
                         </div>
                         <div className="text-sm">
-                            <a href="#" className="text-blue-600 hover:underline">
-                                Forgot password?
-                            </a>
+                            <a href="#" className="text-blue-600 hover:underline">Forgot password?</a>
                         </div>
                     </div>
+
                     <button
                         type="submit"
                         className="w-full bg-blue-600 text-white rounded-md py-2 px-4 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        disabled={loading}
                     >
-                        Sign in
+                        {loading ? "Signing in..." : "Sign in"}
                     </button>
                 </form>
             </div>
@@ -179,13 +202,7 @@ export default function LoginPage({ onClose, setShowSignupModal }) {
             <div className="text-center mt-6">
                 <p className="text-sm text-gray-600">
                     Don't have an account?{" "}
-                    <button
-                        onClick={() => {
-                            onClose();
-                            setShowSignupModal(true);
-                        }}
-                        className="text-blue-600 hover:underline"
-                    >
+                    <button onClick={() => { onClose(); setShowSignupModal(true); }} className="text-blue-600 hover:underline">
                         Sign up
                     </button>
                 </p>

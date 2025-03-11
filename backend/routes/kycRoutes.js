@@ -1,6 +1,6 @@
 import express from "express";
 import {
-  uploadKYC,
+  createApplication,
   getKYCStatus,
   verifyKYC,
 } from "../controllers/kycController.js";

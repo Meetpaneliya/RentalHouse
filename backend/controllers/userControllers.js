@@ -2,9 +2,9 @@
 import { User } from "../models/user.js";
 import { TryCatch, errorMiddleware } from "../middlewares/error.js";
 import ErrorHandler from "../utils/errorHandler.js";
-import jwt from "jsonwebtoken";
 import { uploadFilesToCloudinary } from "../lib/helpers.js";
 import { sendToken } from "../utils/features.js";
+
 
 // Register User
 const registerUser = TryCatch(async (req, res, next) => {
@@ -50,12 +50,12 @@ const loginUser = TryCatch(async (req, res, next) => {
     return next(new ErrorHandler(400, "Please enter email & password"));
 
   const user = await User.findOne({ email }).select("+password");
+
+  if (!user) return next(new ErrorHandler(404, "Invalid User"));
   console.log("Stored Hashed Password:", user.password);
 
-  if (!user) return next(new ErrorHandler(404, "Invalid email or password"));
-
   const isMatch = await user.matchPassword(password);
-  if (!isMatch) return next(new ErrorHandler(401, "Invalid email or password"));
+  if (!isMatch) return next(new ErrorHandler(401, "Invalid password"));
 
   sendToken(res, user, 200, "User logged in successfully");
 });

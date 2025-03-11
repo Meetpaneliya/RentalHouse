@@ -15,6 +15,7 @@
     "@mantine/hooks": "^7.17.1",
     "@material-tailwind/react": "^2.1.10",
     "@types/react-datepicker": "^6.2.0",
+    "axios": "^1.8.2",
     "lucide-react": "^0.477.0",
     "react": "^19.0.0",
     "react-datepicker": "^8.1.0",

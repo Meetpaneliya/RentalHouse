@@ -3,33 +3,40 @@ import { TryCatch } from "../middlewares/error.js";
 import { uploadFilesToCloudinary } from "../lib/helpers.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import cloudinary from "cloudinary";
+import mongoose from "mongoose";
 
 // Get Listings for a Specific User
 const getUserListings = TryCatch(async (req, res, next) => {
-  const userId = req.user;
+  console.log("req.user:", req.user); 
+  
+  const userId = new mongoose.Types.ObjectId(req.user);
+  console.log("🔹 Converted userId:", userId);
 
-  if (!userId)
-    return next(
-      new ErrorHandler(401, "Unauthorized: Please login to view your listings")
-    );
   const page = parseInt(req.query.page) || 1;
   const limit = 10;
   const skip = (page - 1) * limit;
 
-  const listings = await Listing.find({ owner: userId })
+  const listings = await Listing.find({ owner: userId  })
     .skip(skip)
     .limit(limit)
-    .populate("owner", "name email");
+    .populate("owner", "name email")
+    
+  console.log("listings : ", listings);  
+
+  // Count Total Listings for Pagination
+  const totalListings = await Listing.countDocuments({ owner: userId });
 
   if (!listings.length) {
     return res.status(200).json({
       success: true,
       message: "No listings found",
       listings: [],
+      totalListings,
+      page,
     });
   }
 
-  res.status(200).json({ success: true, page, listings });
+  res.status(200).json({ success: true, page, totalListings, listings });
 });
 
 // Create a New Listing
@@ -73,10 +80,8 @@ const createListing = TryCatch(async (req, res, next) => {
 
   // Upload images to Cloudinary
   const uploadedImages = await uploadFilesToCloudinary(images);
-  const imageArray = uploadedImages.map((img) => ({
-    public_id: img.public_id,
-    url: img.url,
-  }));
+  
+ 
 
   // Create the GeoJSON location from lat & lng
   const locationGeo = {
@@ -96,7 +101,7 @@ const createListing = TryCatch(async (req, res, next) => {
     price,
     location,
     locationGeo,
-    images: imageArray,
+    images: uploadedImages,
     owner: req.user,
     propertyType,
     amenities: amenitiesArray,

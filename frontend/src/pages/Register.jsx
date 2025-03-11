@@ -7,12 +7,15 @@ export default function SignupPage({ onClose, setShowLoginModal }) {
         name: "",
         email: "",
         password: "",
+        role: "tenant" // Add default role
     })
     const [errors, setErrors] = useState({
         name: "",
         email: "",
         password: "",
     })
+    const [loading, setLoading] = useState(false);
+    const [apiError, setApiError] = useState("");
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword)
@@ -62,17 +65,43 @@ export default function SignupPage({ onClose, setShowLoginModal }) {
         return valid
     }
 
-    const handleSubmit = (e) => {
-        e.preventDefault()
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-        if (validateForm()) {
-            // Here you would typically send the data to your backend
-            console.log("Form submitted:", formData)
-            // For demo purposes, show an alert
-            alert("Signup successful! You can now login.")
-            onClose()
+        if (!validateForm()) return;
+
+        setLoading(true);
+        setApiError("");
+
+        try {
+            const response = await fetch("http://localhost:4000/api/v1/user/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify(formData),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Signup failed");
+            }
+
+            // Store the token in local storage
+            localStorage.setItem("token", data.token);
+
+            console.log("Signup successful! Token:", data.token);
+            alert("Signup successful! You can now login.");
+            onClose();
+        } catch (error) {
+            console.error("Signup error:", error);
+            setApiError(error.message || "Signup failed");
+        } finally {
+            setLoading(false);
         }
-    }
+    };
 
     return (
         <div className="w-96 max-w-3xl bg-white rounded-lg shadow-xl p-9 relative animate-fadeIn">
@@ -93,20 +122,59 @@ export default function SignupPage({ onClose, setShowLoginModal }) {
             <div className="space-y-4">
                 {/* Social Login Buttons */}
                 <div className="grid grid-cols-2 gap-4">
-                    <button 
+                    <button
                         className="flex items-center justify-center gap-2 p-2 border rounded-md hover:bg-gray-50"
                         onClick={() => console.log("Google signup clicked")}
                     >
                         <FaApple className="text-black" />
                         Apple
                     </button>
-                    <button 
+                    <button
                         className="flex items-center justify-center gap-2 p-2 border rounded-md hover:bg-gray-50"
                         onClick={() => console.log("Facebook signup clicked")}
                     >
                         <FaGoogle className="text-blue-600" />
                         Google
                     </button>
+                </div>
+
+                {/* Role Selection Buttons */}
+                <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                        Select your role
+                    </label>
+                    <div className="grid grid-cols-3 gap-3">
+                        <button
+                            type="button"
+                            onClick={() => setFormData({ ...formData, role: "tenant" })}
+                            className={`p-2 text-sm border rounded-md transition-colors ${formData.role === "tenant"
+                                ? "bg-blue-600 text-white border-blue-600"
+                                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                                }`}
+                        >
+                            Tenant
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setFormData({ ...formData, role: "landlord" })}
+                            className={`p-2 text-sm border rounded-md transition-colors ${formData.role === "landlord"
+                                ? "bg-blue-600 text-white border-blue-600"
+                                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                                }`}
+                        >
+                            Landlord
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setFormData({ ...formData, role: "admin" })}
+                            className={`p-2 text-sm border rounded-md transition-colors ${formData.role === "admin"
+                                ? "bg-blue-600 text-white border-blue-600"
+                                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                                }`}
+                        >
+                            Admin
+                        </button>
+                    </div>
                 </div>
 
                 <div className="relative">
@@ -130,9 +198,8 @@ export default function SignupPage({ onClose, setShowLoginModal }) {
                             placeholder="John Doe"
                             value={formData.name}
                             onChange={handleInputChange}
-                            className={`mt-1 block w-full rounded-md border ${
-                                errors.name ? 'border-red-500' : 'border-gray-300'
-                            } px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                            className={`mt-1 block w-full rounded-md border ${errors.name ? 'border-red-500' : 'border-gray-300'
+                                } px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
                         />
                         {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
                     </div>
@@ -148,9 +215,8 @@ export default function SignupPage({ onClose, setShowLoginModal }) {
                             placeholder="john.doe@example.com"
                             value={formData.email}
                             onChange={handleInputChange}
-                            className={`mt-1 block w-full rounded-md border ${
-                                errors.email ? 'border-red-500' : 'border-gray-300'
-                            } px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                            className={`mt-1 block w-full rounded-md border ${errors.email ? 'border-red-500' : 'border-gray-300'
+                                } px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
                         />
                         {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
                     </div>
@@ -167,9 +233,8 @@ export default function SignupPage({ onClose, setShowLoginModal }) {
                                 placeholder="••••••••"
                                 value={formData.password}
                                 onChange={handleInputChange}
-                                className={`block w-full rounded-md border ${
-                                    errors.password ? 'border-red-500' : 'border-gray-300'
-                                } px-3 py-2 pr-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                                className={`block w-full rounded-md border ${errors.password ? 'border-red-500' : 'border-gray-300'
+                                    } px-3 py-2 pr-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
                             />
                             <button
                                 type="button"
@@ -184,10 +249,15 @@ export default function SignupPage({ onClose, setShowLoginModal }) {
 
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 text-white rounded-md py-2 px-4 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        disabled={loading}
+                        className={`w-full text-white rounded-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition 
+                                 ${loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
                     >
-                        Sign up
+                        {loading ? "Signing up..." : "Sign up"}
                     </button>
+
+                    {/* Display API error message if present */}
+                    {apiError && <p className="text-xs text-red-500 mt-2 text-center">{apiError}</p>}
                 </form>
             </div>
 
