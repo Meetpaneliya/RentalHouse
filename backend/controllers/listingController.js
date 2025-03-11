@@ -44,8 +44,8 @@ const getUserListings = TryCatch(async (req, res, next) => {
 const getAllListings = TryCatch(async (req, res) => {
   try {
     const listings = await Listing.find({}); // Fetch all listings from the database
-    console.log("listings : ", listings);
     res.status(200).json({ success: true, count: listings.length, data: listings });
+    
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to retrieve listings", error: error.message });
   }
@@ -93,7 +93,6 @@ const createListing = TryCatch(async (req, res, next) => {
   // Upload images to Cloudinary
   const uploadedImages = await uploadFilesToCloudinary(images);
   
- 
 
   // Create the GeoJSON location from lat & lng
   const locationGeo = {
