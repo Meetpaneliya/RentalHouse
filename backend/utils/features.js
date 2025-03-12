@@ -7,7 +7,7 @@ const cookieOptions = {
   secure: true,
 };
 const sendToken = (res, user, code, message) => {
-  const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+  const token = jwt.sign({ _id: user._id }, "tempsecret", {
     expiresIn: "15d",
   });
 

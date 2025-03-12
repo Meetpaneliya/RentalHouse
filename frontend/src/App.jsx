@@ -72,6 +72,8 @@ function App() {
           <Route path="/profile" element={() => <Profile />} />
           <Route path="/Room" element={<Rooms />} />
           <Route path="/listings" element={<Listings />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/contact" element={<ContactUs />} />
         </Routes>
 
         {/* Modal Overlays */}

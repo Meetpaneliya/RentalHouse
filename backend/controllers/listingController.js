@@ -8,12 +8,11 @@ import { Review } from "../models/Review.js";
 
 // Get Listings for a Specific User
 const getUserListings = TryCatch(async (req, res, next) => {
-  const userId = req.user;
+  console.log("req.user:", req.user);
 
-  if (!userId)
-    return next(
-      new ErrorHandler(401, "Unauthorized: Please login to view your listings")
-    );
+  const userId = new mongoose.Types.ObjectId(req.user);
+  console.log("🔹 Converted userId:", userId);
+
   const page = parseInt(req.query.page) || 1;
   const limit = 10;
   const skip = (page - 1) * limit;
@@ -23,15 +22,40 @@ const getUserListings = TryCatch(async (req, res, next) => {
     .limit(limit)
     .populate("owner", "name email");
 
+  console.log("listings : ", listings);
+
+  // Count Total Listings for Pagination
+  const totalListings = await Listing.countDocuments({ owner: userId });
+
   if (!listings.length) {
     return res.status(200).json({
       success: true,
       message: "No listings found",
       listings: [],
+      totalListings,
+      page,
     });
   }
 
-  res.status(200).json({ success: true, page, listings });
+  res.status(200).json({ success: true, page, totalListings, listings });
+});
+
+// Get All Listings
+const getAllListings = TryCatch(async (req, res) => {
+  try {
+    const listings = await Listing.find({}); // Fetch all listings from the database
+    res
+      .status(200)
+      .json({ success: true, count: listings.length, data: listings });
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Failed to retrieve listings",
+        error: error.message,
+      });
+  }
 });
 
 // Create a New Listing
@@ -83,10 +107,6 @@ const createListing = TryCatch(async (req, res, next) => {
   }
   // Upload images to Cloudinary
   const uploadedImages = await uploadFilesToCloudinary(images);
-  const imageArray = uploadedImages.map((img) => ({
-    public_id: img.public_id,
-    url: img.url,
-  }));
 
   // Create the GeoJSON location from lat & lng
   const locationGeo = {
@@ -106,7 +126,7 @@ const createListing = TryCatch(async (req, res, next) => {
     price,
     location,
     locationGeo,
-    images: imageArray,
+    images: uploadedImages,
     owner: req.user,
     propertyType,
     amenities: amenitiesArray,
@@ -247,6 +267,7 @@ const deleteListing = TryCatch(async (req, res, next) => {
 
 export {
   getUserListings,
+  getAllListings,
   createListing,
   updateListing,
   deleteListing,

@@ -1,6 +1,7 @@
 // userController.js
 import { User } from "../models/user.js";
 import { TryCatch } from "../middlewares/error.js";
+import { TryCatch } from "../middlewares/error.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import { sendToken } from "../utils/features.js";
 import { compare } from "bcryptjs";

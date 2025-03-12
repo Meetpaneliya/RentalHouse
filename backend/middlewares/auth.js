@@ -18,7 +18,7 @@ export const protect = TryCatch(async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, "tempsecret");
     req.user = decoded._id;
 
     if (!req.user) {

@@ -74,7 +74,7 @@ export default function LoginPage({ onClose, setShowSignupModal }) {
       };
       try {
         const { data } = await axios.post(
-          `${server}/api/v1/user/login`,
+          `http://localhost:4000/api/v1/user/login`,
           formData,
           config
         );

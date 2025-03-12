@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { FaStar, FaRegStar, FaUserCircle } from 'react-icons/fa';
 
-const Ratings = () => {
+
+const Ratings = ({ listing }) => {
     const [expandedReviews, setExpandedReviews] = useState({});
 
     // Add this function after the reviews array
@@ -17,7 +18,7 @@ const Ratings = () => {
         }));
     };
 
-    const reviews = [
+    const reviews = listing?.reviews || [
         {
             title: 'Great Place!',
             content: 'I had a wonderful stay. The house was clean and well-maintained. The host was very friendly and helpful.',
