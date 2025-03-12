@@ -1,12 +1,14 @@
 // userController.js
 import { User } from "../models/user.js";
-import { TryCatch, errorMiddleware } from "../middlewares/error.js";
+import { TryCatch } from "../middlewares/error.js";
 import ErrorHandler from "../utils/errorHandler.js";
-import jwt from "jsonwebtoken";
-import { uploadFilesToCloudinary } from "../lib/helpers.js";
 import { sendToken } from "../utils/features.js";
 import { compare } from "bcryptjs";
-
+import crypto from "crypto";
+import { sendEmail } from "../utils/sendEmail.js";
+import { configDotenv } from "dotenv";
+import { cookieOptions } from "../middlewares/auth.js";
+configDotenv();
 // Register User
 const registerUser = TryCatch(async (req, res, next) => {
   const { name, email, password } = req.body;
@@ -79,56 +81,77 @@ const forgotPassword = TryCatch(async (req, res, next) => {
 
   if (!user) return next(new ErrorHandler(404, "User not found"));
 
+  // Generate Token
   const resetToken = crypto.randomBytes(20).toString("hex");
+
   user.resetPasswordToken = crypto
     .createHash("sha256")
     .update(resetToken)
     .digest("hex");
-  user.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
-  await user.save();
+  user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
 
-  const resetUrl = `${req.protocol}://${req.get(
-    "host"
-  )}/api/auth/reset/${resetToken}`;
+  await user.save({ validateBeforeSave: false });
+
+  // Frontend URL (Make sure it's correct)
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
   try {
     await sendEmail({
       email: user.email,
       subject: "Password Reset Request",
       message: `Click the link to reset your password: ${resetUrl}`,
     });
+
     res
       .status(200)
       .json({ success: true, message: "Password reset link sent" });
   } catch (error) {
+    // If email sending fails, reset token fields
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
     await user.save();
+
     return next(new ErrorHandler(500, "Email could not be sent"));
   }
 });
 
 // Reset Password
-const resetPassword = TryCatch(async (req, res, next) => {
-  const resetToken = crypto
-    .createHash("sha256")
-    .update(req.params.token)
-    .digest("hex");
-  const user = await User.findOne({
-    resetPasswordToken: resetToken,
-    resetPasswordExpire: { $gt: Date.now() },
-  });
+const resetPassword = async (req, res) => {
+  const { email, password, confirmPassword } = req.body;
+  const { token } = req.params;
 
-  if (!user)
-    return next(new ErrorHandler(400, "Invalid or expired reset token"));
+  if (!email || !password || !confirmPassword || !token) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
 
-  user.password = req.body.password;
-  user.resetPasswordToken = undefined;
-  user.resetPasswordExpire = undefined;
-  await user.save();
+  if (password !== confirmPassword) {
+    return res.status(400).json({ message: "Passwords do not match" });
+  }
 
+  try {
+    const user = await User.findOne({ email }).select("+password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found!" });
+    }
+
+    user.password = password; // Consider hashing before saving
+    await user.save();
+
+    sendToken(res, user, 200, "Password reset successfully!");
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const logoutUser = TryCatch(async (req, res, next) => {
   return res
     .status(200)
-    .json({ success: true, message: "Password reset successfully" });
+    .cookie("Auth-Token", " ", { ...cookieOptions, maxAge: 0 })
+    .json({
+      success: true,
+      message: "You have been logged out",
+    });
 });
 
 export {
@@ -139,4 +162,5 @@ export {
   deleteUser,
   forgotPassword,
   resetPassword,
+  logoutUser,
 };

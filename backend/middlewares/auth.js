@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { User } from "../models/user.js"; // Ensure correct path
 import ErrorHandler from "../utils/errorHandler.js"; // Ensure correct path
 
-const cookieOptions = {
+export const cookieOptions = {
   maxAge: 15 * 24 * 60 * 60 * 1000,
   sameSite: "none",
   httpOnly: true,

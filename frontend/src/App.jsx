@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Home } from "./pages/Home";
 import SignupPage from "./pages/Register";
@@ -10,33 +10,40 @@ import { server } from "./lib/config";
 import Listings from "./pages/Listings";
 import { useDispatch, useSelector } from "react-redux";
 import { login, logout } from "./redux/reducers/Auth";
-
+import Profile from "./pages/Profile";
 import { Toaster } from "react-hot-toast";
+import { useMyprofileQuery } from "./redux/APi/api";
+import ForgotPassword from "./components/auth/ForgotPasswordForm";
+import ResetPassword from "./components/auth/ResetPasswordForm";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
+  const { data, error, isLoading } = useMyprofileQuery();
+  const timeoutRef = useRef(null);
+  useEffect(() => {
+    if (data && data.user) {
+      dispatch(login(data.user));
+    } else if (error) {
+      dispatch(logout());
+    }
+  }, [data, error, dispatch]);
 
   useEffect(() => {
-    axios
-      .get(`${server}/api/v1/user/me`, {
-        withCredentials: true,
-      })
-      .then((response) => {
-        dispatch(login(response.data.user));
-      })
-      .catch(() => dispatch(logout()));
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setTimeout(() => {
+    if (!isAuthenticated && !timeoutRef.current) {
+      timeoutRef.current = setTimeout(() => {
         setShowLoginModal(true);
       }, 15000);
-    } else {
+    }
+
+    if (isAuthenticated) {
       setShowLoginModal(false);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
     }
   }, [isAuthenticated]);
 
@@ -60,6 +67,9 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
 
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/forget-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/profile" element={() => <Profile />} />
           <Route path="/Room" element={<Rooms />} />
           <Route path="/listings" element={<Listings />} />
         </Routes>

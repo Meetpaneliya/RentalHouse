@@ -3,6 +3,8 @@ import { TryCatch } from "../middlewares/error.js";
 import { uploadFilesToCloudinary } from "../lib/helpers.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import cloudinary from "cloudinary";
+import { User } from "../models/user.js";
+import { Review } from "../models/Review.js";
 
 // Get Listings for a Specific User
 const getUserListings = TryCatch(async (req, res, next) => {
@@ -44,11 +46,13 @@ const createListing = TryCatch(async (req, res, next) => {
     rooms,
     beds,
     bathrooms,
+    availableFrom,
     lat, // latitude to create locationGeo
     lng, // longitude to create locationGeo
   } = req.body;
 
   const images = req.files;
+  const owner = await User.findOne({ _id: req.user });
 
   // Basic validations
   if (!title || !description || !price || !location || !propertyType) {
@@ -70,7 +74,13 @@ const createListing = TryCatch(async (req, res, next) => {
       )
     );
   }
+  if (owner.role !== "landlord" && owner.role !== "admin") {
+    return next(new ErrorHandler(400, "Please Update your role"));
+  }
 
+  if (!availableFrom) {
+    return next(new ErrorHandler(400, "Available From date is required"));
+  }
   // Upload images to Cloudinary
   const uploadedImages = await uploadFilesToCloudinary(images);
   const imageArray = uploadedImages.map((img) => ({
@@ -103,7 +113,7 @@ const createListing = TryCatch(async (req, res, next) => {
     rooms: rooms || 1,
     beds: beds || 1,
     bathrooms: bathrooms || 1,
-    // rating and reviewsCount will use defaults (0)
+    availableFrom: new Date(availableFrom),
   });
 
   res.status(201).json({ success: true, listing: newListing });
@@ -111,46 +121,18 @@ const createListing = TryCatch(async (req, res, next) => {
 
 // Search Query for Listings
 const searchListings = TryCatch(async (req, res, next) => {
-  const {
-    q,
-    priceMin,
-    priceMax,
-    location,
-    propertyType,
-    ratingMin,
-    amenities,
-  } = req.query;
+  const { date, city } = req.query;
 
   const filter = {};
 
-  if (q) {
-    filter.$or = [
-      { title: { $regex: q, $options: "i" } },
-      { description: { $regex: q, $options: "i" } },
-    ];
+  // Fixing Date Filtering (Using availableFrom)
+  if (date) {
+    filter.availableFrom = { $lte: new Date(date) }; // Listing should be available on or before this date
   }
 
-  if (priceMin || priceMax) {
-    filter.price = {};
-    if (priceMin) filter.price.$gte = Number(priceMin);
-    if (priceMax) filter.price.$lte = Number(priceMax);
-  }
-
-  if (location) {
-    filter.location = { $regex: location, $options: "i" };
-  }
-
-  if (propertyType) {
-    filter.propertyType = propertyType; // exact match for property type
-  }
-
-  if (ratingMin) {
-    filter.rating = { $gte: Number(ratingMin) };
-  }
-
-  if (amenities) {
-    const amenityArray = amenities.split(",").map((a) => a.trim());
-    filter.amenities = { $all: amenityArray };
+  // Fixing City Filtering (Using location)
+  if (city) {
+    filter.location = { $regex: city, $options: "i" }; // Case-insensitive location search
   }
 
   const listings = await Listing.find(filter).populate("owner", "name email");

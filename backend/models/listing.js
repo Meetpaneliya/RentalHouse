@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const ListingSchema = new mongoose.Schema(
   {
@@ -18,6 +18,7 @@ const ListingSchema = new mongoose.Schema(
       },
     },
     status: { type: String, default: "available" },
+    availableFrom: { type: Date, required: true },
     price: { type: Number, required: true },
     location: { type: String, required: true },
     images: [
@@ -41,8 +42,7 @@ const ListingSchema = new mongoose.Schema(
     rooms: { type: Number, default: 1 },
     beds: { type: Number, default: 1 },
     bathrooms: { type: Number, default: 1 },
-    rating: { type: Number, default: 0 },
-    reviewsCount: { type: Number, default: 0 },
+    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
   },
   { timestamps: true }
 );
