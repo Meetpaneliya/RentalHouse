@@ -6,6 +6,8 @@ const ListingForm = () => {
     title: "",
     description: "",
     price: "",
+    size:"",
+    floor:"",
     location: "",
     propertyType: "",
     amenities: "",
@@ -121,6 +123,25 @@ const ListingForm = () => {
           />
         </div>
 
+        <div className="grid grid-cols-2 gap-4">
+          <input
+            type="number"
+            name="size"
+            placeholder="size"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900 "
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="number"
+            name="floor"
+            placeholder="floor"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900 "
+            onChange={handleChange}
+            required
+          />
+        </div>
+
         {/* Property Type & Amenities */}
         <div className="grid grid-cols-2 gap-4">
           <input
@@ -226,4 +247,4 @@ const ListingForm = () => {
   );
 };
 
-export { ListingForm };
+export  default  ListingForm ;

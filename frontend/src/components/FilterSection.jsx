@@ -21,9 +21,8 @@ const FilterSection = ({ onFilterChange }) => {
     availableOnly: false,
     amenities: [],
   });
+
   const [isResetChecked, setIsResetChecked] = useState(false); // ✅ Moved inside component
-
-
   const [showPriceFilter, setShowPriceFilter] = useState(false);
   const [showNearbyFilter, setShowNearbyFilter] = useState(false);
   const [showBedroomsFilter, setShowBedroomsFilter] = useState(false);

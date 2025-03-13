@@ -18,7 +18,7 @@ export default function CitySearch() {
   const navigate = useNavigate();
 
   const handleCityClick = (cityName) => {
-    navigate(`/listings?city=${encodeURIComponent(cityName)}`);
+    navigate(`/filtered-listings?city=${encodeURIComponent(cityName)}`);
   };
 
   return (

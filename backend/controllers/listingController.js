@@ -1,54 +1,60 @@
 import { Listing } from "../models/listing.js";
+import { Review } from "../models/Review.js";
 import { TryCatch } from "../middlewares/error.js";
 import { uploadFilesToCloudinary } from "../lib/helpers.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import cloudinary from "cloudinary";
-import mongoose from "mongoose";
 
+ const getAllListings = async (req, res) => {
+  try {
+    const listings = await Listing.find(); // Fetch all listings from DB
+    res.status(200).json(listings);
+  } catch (error) {
+    console.error("Error fetching listings:", error);
+    res.status(500).json({ message: "Error fetching listings" });
+  }
+};
+
+
+const getListingById = TryCatch(async (req, res, next) => {
+  const { id } = req.params;
+
+  // Fetch listing details
+  const listing = await Listing.findById(id);
+
+  if (!listing) {
+      return res.status(404).json({ success: false, message: "Listing not found" });
+  }
+  const reviews = await Review.find({ listing: id }).populate("user", "name email");
+  res.json({ success: true, data: { listing, reviews } });
+});
 
 // Get Listings for a Specific User
 const getUserListings = TryCatch(async (req, res, next) => {
-  console.log("req.user:", req.user); 
-  
-  const userId = new mongoose.Types.ObjectId(req.user);
-  console.log("🔹 Converted userId:", userId);
+  const userId = req.user;
 
+  if (!userId)
+    return next(
+      new ErrorHandler(401, "Unauthorized: Please login to view your listings")
+    );
   const page = parseInt(req.query.page) || 1;
   const limit = 10;
   const skip = (page - 1) * limit;
 
-  const listings = await Listing.find({ owner: userId  })
+  const listings = await Listing.find({ owner: userId })
     .skip(skip)
     .limit(limit)
-    .populate("owner", "name email")
-    
-  console.log("listings : ", listings);  
-
-  // Count Total Listings for Pagination
-  const totalListings = await Listing.countDocuments({ owner: userId });
+    .populate("owner", "name email");
 
   if (!listings.length) {
     return res.status(200).json({
       success: true,
       message: "No listings found",
       listings: [],
-      totalListings,
-      page,
     });
   }
 
-  res.status(200).json({ success: true, page, totalListings, listings });
-});
-
-// Get All Listings
-const getAllListings = TryCatch(async (req, res) => {
-  try {
-    const listings = await Listing.find({}); // Fetch all listings from the database
-    res.status(200).json({ success: true, count: listings.length, data: listings });
-    
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Failed to retrieve listings", error: error.message });
-  }
+  res.status(200).json({ success: true, page, listings });
 });
 
 // Create a New Listing
@@ -57,6 +63,8 @@ const createListing = TryCatch(async (req, res, next) => {
     title,
     description,
     price,
+    size,
+    floor,
     location,
     propertyType,
     amenities, // expecting a comma-separated string or an array
@@ -92,7 +100,6 @@ const createListing = TryCatch(async (req, res, next) => {
 
   // Upload images to Cloudinary
   const uploadedImages = await uploadFilesToCloudinary(images);
-  
 
   // Create the GeoJSON location from lat & lng
   const locationGeo = {
@@ -110,6 +117,8 @@ const createListing = TryCatch(async (req, res, next) => {
     title,
     description,
     price,
+    size,
+    floor,
     location,
     locationGeo,
     images: uploadedImages,
@@ -280,8 +289,9 @@ const deleteListing = TryCatch(async (req, res, next) => {
 });
 
 export {
-  getUserListings,
   getAllListings,
+  getListingById,
+  getUserListings,
   createListing,
   updateListing,
   deleteListing,

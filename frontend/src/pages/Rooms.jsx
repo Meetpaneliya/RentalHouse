@@ -1,192 +1,216 @@
-import React, { useState } from 'react'
-import Navbar from '../components/Navbar'
-import { SlShare, SlCalender } from "react-icons/sl"
-import { GoHeart, GoHeartFill } from "react-icons/go"
-import { VscHome } from "react-icons/vsc";
-import { FaWifi } from "react-icons/fa";
-import { MdTv } from "react-icons/md";
-import { TbAirConditioning } from "react-icons/tb";
-import { GiHeatHaze } from "react-icons/gi";
-import { GrElevator } from "react-icons/gr";
-import Ratings from '../components/Ratings'
-import { useLocation } from 'react-router-dom';
-import Footer from '../components/Footer'
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import Navbar from "../components/Navbar2";
+import { FaWifi, FaTv, FaSnowflake, FaShower, FaStar } from "react-icons/fa";
+import Footer from "../components/Footer";
+import { Dialog } from "@headlessui/react";
 
 const Rooms = () => {
+  const { id } = useParams();
+  const [room, setRoom] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
-  const amenitiesIcons = {
-    Elevator: <GrElevator />,
-    WiFi: <FaWifi />,
-    TV: <MdTv />,
-    "Air Conditioning": <TbAirConditioning />,
-    Geyser: <GiHeatHaze />,
+
+  useEffect(() => {
+    const fetchRoomDetails = async () => {
+      try {
+        console.log("Fetching room details for ID:", id);
+        const response = await axios.get(
+          `http://localhost:4000/api/v1/listings/${id}`,
+          { headers: { "Cache-Control": "no-cache" } }
+        );
+
+        console.log("API Response:", response.data);
+        if (!response.data.success) throw new Error("Listing not found");
+
+        setRoom(response.data.data.listing);
+        setReviews(response.data.data.reviews);
+      } catch (err) {
+        console.error("Error fetching room details:", err);
+        setError("Failed to load room details.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRoomDetails();
+  }, [id]);
+
+
+  const fetchReviews = async () => {
+    try {
+      const response = await axios.get(`http://localhost:4000/api/v1/reviews/${id}`);
+      setReviews(response.data.reviews); // ✅ Update state with new reviews
+    } catch (err) {
+      console.error("Error fetching reviews:", err);
+    }
   };
 
-  const location = useLocation();
-  const { listing } = location.state || {};
+  useEffect(() => {
+    fetchReviews(); // ✅ Fetch reviews when component loads
+  }, [id]);
 
-  const [isFavorite, setIsFavorite] = useState(false)
-  const [isExpanded, setIsExpanded] = useState(false)
+  // Call fetchReviews() after submitting a review
+  const submitReview = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/v1/reviews/",
+        { listingId: id, rating, comment },
+        { withCredentials: true }
+      );
 
-  const description = listing?.description || "No description available.";
+      console.log("Review Added:", response.data);
 
-  const shortenedText = description.split(' ').slice(0, 60).join(' ') // Show first 30 words
+      setSuccessMessage("Review submitted successfully!");
+      setIsModalOpen(false);
 
-  const toggleDescription = () => {
-    setIsExpanded(!isExpanded)
-  }
+      fetchReviews(); // ✅ Fetch updated reviews
+    } catch (err) {
+      console.error("Error adding review:", err);
+      setError("Failed to submit review.");
+    }
+  };
 
-  const toggleFavorite = () => {
-    setIsFavorite(!isFavorite)
-  }
+
+  if (loading) return <p className="text-center text-gray-600">Loading...</p>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
+  if (!room) return <p className="text-center text-gray-600">No room details available.</p>;
 
   return (
-    <div>
+    <div className="">
+
       <Navbar />
 
-      <div className="max-w-7xl flex items-center justify-between mx-auto mt-10 mb-5">
-        <div className=" text-blue-900">
-          <h1 className='text-3xl font-bold '>{listing.title} - {listing.code}</h1>
-          <p className='text-xl font-bold'>{listing.propertyType}</p>
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-blue-800">{room.title} - #{room._id}</h1>
         </div>
 
-        <div className="flex items-center justify-end text-blue-900 gap-3">
-          <SlShare size={24} />
-          <button
-            onClick={toggleFavorite}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            {isFavorite ? <GoHeartFill size={24} className="text-red-500" /> : <GoHeart size={24} />}
-          </button>
-        </div>
-      </div>
-
-      {/* Image Gallery */}
-      <div className="px-2 mx-auto max-w-7xl rounded-full"> {/* Reduced max width further */}
-        <div className="grid grid-cols-3 gap-3 "> {/* Reduced height and gap further */}
-          <div className="col-span-2 relative">
+        {/* Image & Thumbnails */}
+        <div className="grid grid-cols-5 gap-4">
+          <div className="col-span-3">
             <img
-              src="/assets/room3.jpg"
-              alt="Room"
-              className="w-full h-full object-cover rounded-3xl shadow-sm" /* Smaller radius */
+              className="w-full h-96 object-cover rounded-xl shadow-md"
+              src={room.images[0]?.url}
+              alt={room.title}
             />
           </div>
-          <div className="flex flex-col gap-3"> {/* Reduced gap between images */}
-            <img
-              src="/assets/room2.jpg"
-              alt="Room"
-              className="w-full h-[32%] object-cover rounded-2xl shadow-sm"
-            />
-            <img
-              src="/assets/room3.jpg"
-              alt="Room"
-              className="w-full h-[32%] object-cover rounded-2xl shadow-sm"
-            />
-            <img
-              src="/assets/room4.jpg"
-              alt="Room"
-              className="w-full h-[32%] object-cover rounded-2xl shadow-sm"
-            />
+          <div className="col-span-2 grid grid-cols-2 gap-2">
+            {room.images?.slice(1, 5).map((image, index) => (
+              <img
+                key={index}
+                className="w-full h-36 object-cover rounded-lg hover:scale-105 transition"
+                src={image.url}
+                alt={`Thumbnail ${index + 1}`}
+              />
+            ))}
           </div>
         </div>
-      </div>
 
-      {/* Details Section */}
-      <div className="max-w-7xl mx-auto mt-5 space-y-5 flex ">
-        <div className="flex flex-col gap-5">
-          {/* Room Details */}
-          <div>
-            <div className='max-w-7xl mx-auto mt-5 space-y-5'>
-              <h1 className='text-3xl font-bold'>Overview</h1>
-              <h2 className='flex text-xl gap-2 font-semibold'><span><VscHome size={30} /></span>{listing.area} ft | {listing.floor}th Floor | {listing.beds} Beds | {listing.bathrooms} Bathroom</h2>
-              <h2 className='flex text-xl gap-2 items-center font-semibold'><span><SlCalender size={20} /></span>Available from {listing.date}</h2>
+        {/* Overview & Booking Section */}
+        <div className="grid grid-cols-3 gap-6 mt-6">
+          {/* Overview Section */}
+          <div className="col-span-2">
+            <h2 className="text-2xl font-semibold">Overview</h2>
+            <p className="text-gray-600">📏 {room.size} ft² | 🏢 {room.floor} Floor | 🛏 {room.beds} Beds | 🛁 {room.bathrooms} Bath</p>
+            <p className="text-green-600 font-medium mt-1">📅 Available from {room.availableDate || "N/A"}</p>
+            <p className="text-gray-700 mt-2 leading-relaxed">{room.description}</p>
+
+            {/* Amenities */}
+            <div className="mt-6 border-t pt-4">
+              <h2 className="text-xl font-semibold">This place offers</h2>
+              <div className="grid grid-cols-3 gap-4 mt-3">
+                {room.amenities?.map((amenity, index) => (
+                  <div key={index} className="flex items-center space-x-2 text-gray-700">
+                    <span className="text-blue-600">{amenity === "wifi" ? <FaWifi /> : amenity === "tv" ? <FaTv /> : amenity === "ac" ? <FaSnowflake /> : amenity === "geyser" ? <FaShower /> : null}</span>
+                    <span>{amenity}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className='max-w-3xl mt-5'>
-              <p className='text-sm text-gray-600 font-semibold'>
-                {isExpanded ? description : shortenedText}
-                {description.length > shortenedText.length && (
-                  <button
-                    onClick={toggleDescription}
-                    className="ml-2 text-blue-600 hover:text-blue-800 font-medium"
-                  >
-                    {isExpanded ? 'Show Less' : '...Show More'}
-                  </button>
-                )}
-              </p>
-            </div>
-
-          </div>
-
-          <div>
-            <hr className="border-t-2 border-blue-500 w-9/12" /> {/* Single blue border for partition */}
-          </div>
-
-          {/* Amenities */}
-          <div>
-            <h1 className="text-3xl font-bold">Amenities</h1>
-            <div className="flex flex-wrap gap-3 mt-4">
-              {listing.amenities?.map((amenity, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-800 text-white px-4 py-1 rounded-full flex items-center gap-1"
-                >
-                  <span>{amenitiesIcons[amenity] || "🔹"}</span>
-                  {amenity}
+            {/* Reviews */}
+            <div className="mt-6 border-t pt-4">
+              <h2 className="text-xl font-semibold">Reviews</h2>
+              {reviews.length > 0 ? (
+                <div className="mt-3 space-y-4">
+                  {reviews.map((review) => (
+                    <div key={review._id} className="p-4 bg-gray-100 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <span className="font-semibold">{review.user?.name || "Anonymous"}</span>
+                        <div className="flex text-yellow-500">
+                          {[...Array(review.rating)].map((_, i) => <FaStar key={i} />)}
+                        </div>
+                      </div>
+                      <p className="text-gray-700 mt-1">{review.comment}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              ) : (
+                <p className="text-gray-500 mt-2">No reviews yet.</p>
+              )}
+            </div>
+            <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" onClick={() => setIsModalOpen(true)}>Add Your Review</button>
+          </div>
+
+          {/* Booking Section */}
+          <div className="col-span-1 p-6 bg-white shadow-md rounded-lg border border-gray-200">
+            <h3 className="text-lg font-semibold">Select bedroom and dates</h3>
+            <div className="flex flex-col gap-3 mt-3">
+              <input type="date" className="w-full p-2 border rounded-md" />
+              <input type="date" className="w-full p-2 border rounded-md" />
+            </div>
+            <div className="mt-3 text-gray-700">
+              <p>💲 {room.price} x nights</p>
+              <p>🔖 Discount: -${Math.floor(room.price * 0.1)}</p>
+              <p>🎉 Service Fee: ${Math.floor(room.price * 0.05)}</p>
+            </div>
+            <div className="mt-2 text-lg font-bold text-blue-800">
+              Total: ${room.price - Math.floor(room.price * 0.1) + Math.floor(room.price * 0.05)}
+            </div>
+            <button className="mt-4 w-full px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Reserve</button>
+            <p className="text-gray-500 text-sm text-center mt-2">You won't get charged yet</p>
+          </div>
+        </div>
+
+        {/* Review Modal */}
+        <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)} className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg w-96">
+            <h2 className="text-xl font-semibold">Add Your Review</h2>
+            <div className="mt-3">
+              <label className="block text-gray-700">Rating:</label>
+              <select
+                className="w-full p-2 border rounded-md"
+                value={rating}
+                onChange={(e) => setRating(e.target.value)}
+              >
+                {[1, 2, 3, 4, 5].map((num) => (
+                  <option key={num} value={num}>{num} Star</option>
+                ))}
+              </select>
+            </div>
+            <div className="mt-3">
+              <label className="block text-gray-700">Comment:</label>
+              <textarea
+                className="w-full p-2 border rounded-md"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+              />
+            </div>
+            <div className="mt-4 flex justify-end gap-2">
+              <button className="px-4 py-2 bg-gray-400 text-white rounded-lg" onClick={() => setIsModalOpen(false)}>Cancel</button>
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" onClick={submitReview}>Submit</button>
             </div>
           </div>
-
-          <div>
-            <hr className="border-t-2 border-blue-500 w-9/12 mt-3" /> {/* Single blue border for partition */}
-          </div>
-        </div>
-
-        {/* Payment Section */}
-        <div className="max-w-sm w-full mx-auto bg-gray-800 shadow-lg rounded-xl overflow-hidden border border-gray-200 p-6 transition-transform hover:scale-105 duration-300">
-          {/* Header */}
-          <h3 className="text-xl font-bold text-gray-200 text-center">Premium Plan</h3>
-          <p className="text-gray-300 text-center mt-1">Best for professionals</p>
-
-          {/* Price */}
-          <div className="flex justify-center items-center mt-4">
-            <span className="text-3xl font-bold text-blue-600">${listing.price}</span>
-            <span className="text-blue-600 ml-1 text-3xl font-semibold">/-</span>
-          </div>
-
-          {/* Features */}
-          <ul className="mt-6 space-y-3 text-gray-300">
-            <li className="flex items-center">
-              ✅ Full Access to Features
-            </li>
-            <li className="flex items-center">
-              ✅ 24/7 Customer Support
-            </li>
-            <li className="flex items-center">
-              ✅ Secure Payment Processing
-            </li>
-            <li className="flex items-center">
-              ✅ Cancel Anytime
-            </li>
-          </ul>
-
-          {/* Call-to-Action Button */}
-          <div className="mt-6">
-            <button className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition">
-              Subscribe Now
-            </button>
-          </div>
-
-          {/* Footer */}
-          <p className="text-sm text-gray-300 text-center mt-4">No hidden fees. Cancel anytime.</p>
-        </div>
-
-      </div>
-
-
-      <div>
-        <Ratings listing={listing} />
+        </Dialog>
       </div>
 
       {/* Search CTA Section (with rounded corners and card effect) */}
@@ -224,10 +248,12 @@ const Rooms = () => {
         </div>
       </div>
 
-      <Footer />
+      <div>
+        <Footer />
+      </div>
 
     </div>
-  )
-}
+  );
+};
 
-export default Rooms
+export default Rooms;

@@ -6,14 +6,16 @@ import LoginPage from "./pages/Login";
 import axios from "axios";
 import "./index.css";
 import Rooms from "./pages/Rooms";
+import Favorites from "./pages/Favorites";
 import { server } from "./lib/config";
 import Listings from "./pages/Listings";
+import ListingForm from "./pages/ListingForm";
 import { useDispatch, useSelector } from "react-redux";
 import { login, logout } from "./redux/reducers/Auth";
 import AboutUs from "./components/AboutUs";
 import ContactUs from "./components/ContactUs";
-
 import { Toaster } from "react-hot-toast";
+
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.auth);
@@ -36,7 +38,7 @@ function App() {
     if (!isAuthenticated) {
       setTimeout(() => {
         setShowLoginModal(true);
-      }, 15000);
+      });
     } else {
       setShowLoginModal(false);
     }
@@ -60,12 +62,16 @@ function App() {
           />
 
           <Route path="/signup" element={<SignupPage />} />
-
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/Room/:id" element={<Rooms />} />
-          <Route path="/listings" element={<Listings />} />
+
+          <Route path="/filtered-listings" element={<Listings />} />
+          <Route path="/room/:id" element={<Rooms />} />
+          <Route path="/ListingForm" element={<ListingForm />} />
+
           <Route path="/about" element={<AboutUs/>}/>
           <Route path="/contact" element={<ContactUs/>}/>
+          
+          <Route path="/favorites/:id" element={<Favorites />}/>
         </Routes>
 
         {/* Modal Overlays */}
