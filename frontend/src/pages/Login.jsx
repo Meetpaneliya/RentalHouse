@@ -5,6 +5,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { login } from "../redux/reducers/Auth";
 import { server } from "../lib/config";
+import { Link } from "react-router-dom";
 
 export default function LoginPage({ onClose, setShowSignupModal }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -207,9 +208,12 @@ export default function LoginPage({ onClose, setShowSignupModal }) {
               </label>
             </div>
             <div className="text-sm">
-              <a href="#" className="text-blue-600 hover:underline">
+              <Link
+                to={"/forget-password"}
+                className="text-blue-600 hover:underline"
+              >
                 Forgot password?
-              </a>
+              </Link>
             </div>
           </div>
           <button

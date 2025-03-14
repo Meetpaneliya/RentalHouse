@@ -1,30 +1,139 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Menu, X, User } from "lucide-react";
+import { useSelector, useDispatch } from "react-redux";
+import { useAsyncMutation } from "../hooks/useError";
+import { useLogoutuserMutation } from "../redux/APi/api";
+
 
 const Navbar = ({ setShowLoginModal, setShowSignupModal }) => {
-    return (
-        <header className="flex justify-between w-full px-8 py-4 shadow-md">
-            <Link to="/" className="text-2xl font-semibold text-slate-200">June</Link>
-            <nav className="space-x-16">
-                <Link to="/about" className="text-slate-200 font-semibold hover:text-gray-400">About</Link>
-                <Link to="/cities" className="text-slate-200 font-semibold hover:text-gray-400">Cities</Link>
-                <Link to="/contact" className="text-slate-200 font-semibold hover:text-gray-400">Contact</Link>
-                
-                <button 
-                    onClick={() => setShowLoginModal(true)}
-                    className="text-slate-200 font-semibold hover:text-gray-400"
-                >
-                    Login
-                </button>
-                <button
-                    onClick={() => setShowSignupModal(true)} 
-                    className="bg-gray-900 text-white px-4 py-2 rounded hover:bg-gray-800 transition"
-                >
-                    Sign Up
-                </button>
-            </nav>
-        </header>
-    );
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAuthenticated } = useSelector((state) => state.auth);
+  const [loggingout, isloggingOut] = useAsyncMutation(useLogoutuserMutation);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleLogout = async () => {
+    await loggingout("Logging Out", true);
+    dispatch(logout());
+    navigate("/");
+  };
+
+  return (
+    <header className="bg-transparent text-white shadow-md">
+      <div className="container mx-auto flex items-center justify-between px-6 py-4">
+        {/* Logo */}
+        <Link to="/" className="text-2xl font-semibold">
+          June
+        </Link>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center space-x-8">
+          <Link to="/about" className="hover:text-gray-400">
+            About
+          </Link>
+          <Link to="/cities" className="hover:text-gray-400">
+            Cities
+          </Link>
+          <Link to="/contact" className="hover:text-gray-400">
+            Contact
+          </Link>
+        </nav>
+
+        {/* Right Section: Buttons & Profile */}
+        {isAuthenticated ? (
+          <div className="relative group p-2">
+            <User className="p-2 h-10 w-10 shadow-md rounded-full cursor-pointer hover:text-gray-200" />
+            <div className="absolute right-0 mt-2 w-48 bg-white text-gray-900 rounded shadow-lg hidden group-hover:block">
+              <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100">
+                Profile
+              </Link>
+              <Link
+                to="/settings"
+                className="block px-4 py-2 hover:bg-gray-100"
+              >
+                Settings
+              </Link>
+              <button
+                disabled={isloggingOut}
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="hidden md:flex items-center space-x-4">
+            <button
+              onClick={() => setShowLoginModal(true)}
+              className="hover:text-gray-400"
+            >
+              Login
+            </button>
+            <button
+              onClick={() => setShowSignupModal(true)}
+              className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-500 transition"
+            >
+              Sign Up
+            </button>
+          </div>
+        )}
+
+        {/* Mobile Menu Button */}
+        <button
+          className="md:hidden text-white"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+          {isMenuOpen ? (
+            <X className="w-6 h-6" />
+          ) : (
+            <Menu className="w-6 h-6" />
+          )}
+        </button>
+      </div>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <nav className="md:hidden bg-transparent/40 text-white px-6 py-4 space-y-2">
+          <Link to="/about" className="block hover:text-gray-400">
+            About
+          </Link>
+          <Link to="/cities" className="block hover:text-gray-400">
+            Cities
+          </Link>
+          <Link to="/contact" className="block hover:text-gray-400">
+            Contact
+          </Link>
+
+          {!isAuthenticated ? (
+            <div className="flex flex-col space-y-2 mt-6">
+              <button
+                onClick={() => setShowLoginModal(true)}
+                className="block w-full text-left  rounded hover:text-gray-300/30 transition"
+              >
+                Login
+              </button>
+              <button
+                onClick={() => setShowSignupModal(true)}
+                className="block w-full text-left rounded hover:text-gray-300/30 transition"
+              >
+                Sign Up
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={handleLogout}
+              disabled={isloggingOut}
+              className="block w-full text-left rounded hover:text-gray-300/30 transition"
+            >
+              Logout
+            </button>
+          )}
+        </nav>
+      )}
+    </header>
+  );
 };
 
 export default Navbar;

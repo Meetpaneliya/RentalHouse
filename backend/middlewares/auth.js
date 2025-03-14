@@ -3,10 +3,16 @@ import jwt from "jsonwebtoken";
 import { User } from "../models/user.js"; // Ensure correct path
 import ErrorHandler from "../utils/errorHandler.js"; // Ensure correct path
 
+export const cookieOptions = {
+  maxAge: 15 * 24 * 60 * 60 * 1000,
+  sameSite: "none",
+  httpOnly: true,
+  secure: true,
+};
+
 export const protect = TryCatch(async (req, res, next) => {
- 
   let token = req.cookies["Auth-Token"];
-  
+
   if (!token) {
     return next(new ErrorHandler(401, "Not authorized, no token"));
   }
