@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { FaBed, FaBath } from "react-icons/fa";
 import { MdLocationOn, MdOutlineSquareFoot } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import FilterSection from "../components/FilterSection";
 
 const Listings = () => {
   const [activeFilter, setActiveFilter] = useState(null);
@@ -24,6 +25,7 @@ const Listings = () => {
     const fetchListings = async () => {
       try {
         const response = await axios.get("http://localhost:4000/api/v1/listings/all");
+
         setListings(response.data);
         setFilteredListings(response.data);
       } catch (error) {
@@ -33,21 +35,36 @@ const Listings = () => {
     fetchListings();
   }, []);
 
-  useEffect(() => {
-    const updatedListings = listings.filter((listing) => {
-      return (
-        listing.price >= filters.price[0] &&
-        listing.price <= filters.price[1] &&
-        listing.rooms >= filters.rooms &&
-        listing.beds >= filters.beds &&
-        listing.bathrooms >= filters.bathrooms &&
-        (filters.amenities.length === 0 || filters.amenities.every(amenity => listing.amenities.includes(amenity))) &&
-        (filters.location === "" || listing.location.toLowerCase().includes(filters.location.toLowerCase()))
-      );
-    });
-
-    setFilteredListings(updatedListings);
-  }, [filters, listings]);
+    // Filter listings based on the filters state
+    useEffect(() => {
+      const filterListings = () => {
+        const filtered = listings.filter((listing) => {
+          const withinPriceRange =
+            listing.price >= filters.price[0] && listing.price <= filters.price[1];
+          const matchesRooms = listing.rooms >= filters.rooms;
+          const matchesBeds = listing.beds >= filters.beds;
+          const matchesBathrooms = listing.bathrooms >= filters.bathrooms;
+          const matchesLocation = filters.location
+            ? listing.location.toLowerCase().includes(filters.location.toLowerCase())
+            : true;
+          const matchesAmenities = filters.amenities.every((amenity) =>
+            listing.amenities.includes(amenity)
+          );
+  
+          return (
+            withinPriceRange &&
+            matchesRooms &&
+            matchesBeds &&
+            matchesBathrooms &&
+            matchesLocation &&
+            matchesAmenities
+          );
+        });
+        setFilteredListings(filtered);
+      };
+  
+      filterListings();
+    }, [filters, listings]);
 
   const applyFilter = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -58,37 +75,10 @@ const Listings = () => {
   return (
     <div className="relative p-4">
       <nav className="flex justify-between items-center bg-white shadow-md p-4 border-b border-gray-300">
-        <h1 className="text-xl font-bold text-indigo-800">StaySafe</h1>
-        <div className="flex gap-2">
-          {["Price", "Nearby", "Bedrooms", "Bed/Bath", "Location", "Amenities"].map((filter) => (
-            <button
-              key={filter}
-              onClick={() => setActiveFilter(filter.toLowerCase())}
-              className="px-4 py-2 bg-white border border-gray-300 rounded-full shadow-sm hover:bg-gray-100 text-gray-700"
-            >
-              {filter} ▼
-            </button>
+        <h1 className="text-xl font-bold text-indigo-800">June</h1>
+         
+        <FilterSection onFilterChange={applyFilter}/>
 
-          ))}
-          <button
-            onClick={() => {
-              setFilters({
-                price: [500, 5000],
-                rooms: 1,
-                beds: 1,
-                bathrooms: 1,
-                amenities: [],
-                location: "",
-              });
-              setFilteredListings(listings); // Reset to all listings
-              setActiveFilter(null);
-            }}
-            className="px-4 py-2 bg-red-500 text-white border border-red-600 rounded-full shadow-sm hover:bg-red-600"
-          >
-            Reset
-          </button>
-
-        </div>
         <button
           onClick={() => navigate("/ListingForm")}
           className="px-4 py-2 bg-blue-600 text-white rounded-full shadow-md hover:bg-blue-900 transition"
@@ -156,8 +146,6 @@ const Listings = () => {
               />
             )}
 
-
-
             {activeFilter === "amenities" && (
               <div className="space-y-2">
                 {["WiFi", "AC", "Geyser"].map((amenity) => (
@@ -177,37 +165,68 @@ const Listings = () => {
                 ))}
               </div>
             )}
+
+            {/* Reset */}
             <div className="flex justify-between mt-4">
               <button onClick={() => setActiveFilter(null)} className="px-4 py-2 bg-gray-300 rounded-md">Reset</button>
               <button onClick={() => applyFilter(activeFilter, filters[activeFilter])} className="px-4 py-2 bg-indigo-800 text-white rounded-md">Apply</button>
             </div>
+
           </div>
         </Dialog>
       )}
 
       <div className="p-4">
-        <h2 className="text-2xl font-semibold mb-4">Filtered Listings</h2>
+        <h2 className="text-2xl font-semibold mb-4">All Listings</h2>
         {filteredListings.length === 0 ? (
           <p>No listings match your filters.</p>
         ) : (
-
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ">
             {filteredListings.map((listing) => (
-              <li key={listing._id} className="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-300">
-                <Link to={`/Room/${listing._id}`} key={listing._id} >
-                  <img src={listing.images?.[0]?.url || "https://via.placeholder.com/300"} alt={listing.title} className="w-full h-48 object-cover" />
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold">{listing.title}</h3>
-                    <p className="text-gray-500 text-sm">#{listing.id}</p>
-                    <div className="flex items-center gap-2 text-gray-600 mt-2 text-sm">
-                      <MdOutlineSquareFoot /> {listing.size} ft | {listing.floor} Floor | <FaBed /> {listing.beds} Beds | <FaBath /> {listing.bathrooms} Bath
-                    </div>
+              <li
+                key={listing._id}
+                className="relative bg-white shadow-lg rounded-xl overflow-hidden border border-gray-300 hover:shadow-4xl transition-shadow duration-300"
+              >
+                <Link to={`/Room/${listing._id}`} className="block group">
+                  {/* Image Section */}
+                  <div className="relative w-full h-60">
+                    <img
+                      src={listing.images?.[0]?.url || "https://via.placeholder.com/300"}
+                      alt={listing.title}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
+                  </div>
+
+                  {/* Top-left: Title */}
+                  <h3 className="absolute top-4 left-4 bg-black bg-opacity-50 text-white text-base font-semibold px-3 py-1 rounded-lg shadow-md">
+                    {listing.title}
+                  </h3>
+
+                  {/* Top-right: Status */}
+                  <span className="absolute top-4 right-4 bg-green-600  text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
+                    {listing.status || "Available"}
+                  </span>
+
+                  {/* Bottom Section: Details */}
+                  <div className="absolute bottom-0 w-full bg-black bg-opacity-15 text-white text-sm p-4 flex justify-between items-center">
+                    <span className="flex items-center gap-2">
+                      <MdOutlineSquareFoot className="text-white" /> {listing.size} ft²
+                    </span>
+                    <span className="flex items-center gap-2">
+                      <FaBed className="text-white" /> {listing.beds} Beds
+                    </span>
+                    <span className="flex items-center gap-2">
+                      <FaBath className="text-white" /> {listing.bathrooms} Baths
+                    </span>
+                    <span className="flex items-center gap-2">
+                      <MdLocationOn className="text-white" /> {listing.floor} Floor
+                    </span>
                   </div>
                 </Link>
               </li>
             ))}
           </ul>
-
         )}
       </div>
     </div>

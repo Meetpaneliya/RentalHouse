@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-import { server } from "../../lib/config";
 import toast from "react-hot-toast";
 import { useResetpasswordMutation } from "../../redux/APi/api";
 import { useAsyncMutation } from "../../hooks/useError";

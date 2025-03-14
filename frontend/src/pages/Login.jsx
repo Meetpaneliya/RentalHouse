@@ -4,7 +4,6 @@ import { useDispatch } from "react-redux";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { login } from "../redux/reducers/Auth";
-import { server } from "../lib/config";
 import { Link } from "react-router-dom";
 
 export default function LoginPage({ onClose, setShowSignupModal }) {
