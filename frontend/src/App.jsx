@@ -15,6 +15,8 @@ import { Toaster } from "react-hot-toast";
 import { useMyprofileQuery } from "./redux/APi/api";
 import ForgotPassword from "./components/auth/ForgotPasswordForm";
 import ResetPassword from "./components/auth/ResetPasswordForm";
+import AboutUs from "./components/AboutUs";
+import ContactUs from "./components/ContactUs";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.auth);
@@ -70,7 +72,7 @@ function App() {
           <Route path="/forget-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/profile" element={() => <Profile />} />
-          <Route path="/Room" element={<Rooms />} />
+          <Route path="/room/:id" element={<Rooms />} />
           <Route path="/listings" element={<Listings />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />

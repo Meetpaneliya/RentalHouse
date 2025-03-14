@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, redirect, useNavigate } from "react-router-dom";
 import { Menu, X, User } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useAsyncMutation } from "../hooks/useError";
@@ -7,14 +7,13 @@ import { useLogoutuserMutation } from "../redux/APi/api";
 
 const Navbar = ({ setShowLoginModal, setShowSignupModal }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const [loggingout, isloggingOut] = useAsyncMutation(useLogoutuserMutation);
-  const navigate = useNavigate();
 
   const handleLogout = async () => {
     await loggingout("Logging Out", true);
     dispatch(logout());
-    navigate("/");
+    redirect("/");
   };
 
   return (
@@ -43,9 +42,9 @@ const Navbar = ({ setShowLoginModal, setShowSignupModal }) => {
           <div className="relative group p-2">
             <User className="p-2 h-10 w-10 shadow-md rounded-full cursor-pointer hover:text-gray-200" />
             <div className="absolute right-0 mt-2 w-48 bg-white text-gray-900 rounded shadow-lg hidden group-hover:block">
-              <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100">
-                Profile
-              </Link>
+              <p className="block px-4 py-2 text-xs font-semibold hover:bg-gray-100">
+                {`Logged in as ${user.email}`}
+              </p>
               <Link
                 to="/settings"
                 className="block px-4 py-2 hover:bg-gray-100"

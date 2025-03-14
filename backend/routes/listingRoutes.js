@@ -17,7 +17,7 @@ router.get("/all-listings", protect, getAllListings);
 router.get("/search", protect, searchListings); // Search listings by query
 router.get("/nearby", protect, SearchNearbyListings); // Search listings by location
 router.post("/create", protect, attachmentsMulter, createListing); // Create listing
-router.put("/:id", protect, updateListing); // Update listing
-router.delete("/:id", protect, deleteListing); // Delete listing
+router.put("/update/:id", protect, updateListing); // Update listing
+router.delete("/delete/:id", protect, deleteListing); // Delete listing
 
 export default router;

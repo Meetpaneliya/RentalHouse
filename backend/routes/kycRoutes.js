@@ -11,6 +11,8 @@ const router = express.Router();
 
 router.post("/application", protect, kycUpload, createApplication);
 router.get("/status", protect, getKYCStatus);
+
+// dont use this as this is gonna get verified by admin
 router.put("/verify", protect, verifyKYC);
 
 export default router;
