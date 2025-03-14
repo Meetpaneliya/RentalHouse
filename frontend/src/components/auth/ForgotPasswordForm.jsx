@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import toast from "react-hot-toast";
+
 import { useForgetpasswordMutation } from "../../redux/APi/api";
 import { useAsyncMutation } from "../../hooks/useError";
 
 const ForgotPassword = () => {
+  const [state, setState] = useState({ email: "" });
   const [ForgetPasswordLink, isForgetPasswordLoading] = useAsyncMutation(
     useForgetpasswordMutation
   );

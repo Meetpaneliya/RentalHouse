@@ -4,7 +4,6 @@ import { useDispatch } from "react-redux";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { login } from "../redux/reducers/Auth";
-import { server } from "../lib/config";
 import { Link } from "react-router-dom";
 
 export default function LoginPage({ onClose, setShowSignupModal }) {
@@ -104,8 +103,8 @@ export default function LoginPage({ onClose, setShowSignupModal }) {
       </button>
 
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold">Please Login to our Website</h2>
-        <p className="text-gray-600">Sign in to your account</p>
+        <h2 className="text-2xl font-bold">Welcome Back to RentalHouse</h2>
+
       </div>
 
       <div className="space-y-4">
@@ -153,6 +152,7 @@ export default function LoginPage({ onClose, setShowSignupModal }) {
               placeholder="john.doe@example.com"
               value={formData.email}
               onChange={handleInputChange}
+              autoComplete="email"
               className={`mt-1 block w-full rounded-md border ${
                 errors.email ? "border-red-500" : "border-gray-300"
               } px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
@@ -175,6 +175,7 @@ export default function LoginPage({ onClose, setShowSignupModal }) {
               placeholder="••••••••"
               value={formData.password}
               onChange={handleInputChange}
+              autoComplete="current-password"
               className={`block w-full rounded-md border ${
                 errors.password ? "border-red-500" : "border-gray-300"
               } px-3 py-2 pr-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}

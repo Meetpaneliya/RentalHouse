@@ -1,18 +1,45 @@
 import { Listing } from "../models/listing.js";
+import { Review } from "../models/Review.js";
 import { TryCatch } from "../middlewares/error.js";
 import { uploadFilesToCloudinary } from "../lib/helpers.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import cloudinary from "cloudinary";
-import { User } from "../models/user.js";
-import { Review } from "../models/Review.js";
+
+ const getAllListings = async (req, res) => {
+  try {
+    const listings = await Listing.find(); // Fetch all listings from DB
+    res.status(200).json(listings);
+  } catch (error) {
+    console.error("Error fetching listings:", error);
+    res.status(500).json({ message: "Error fetching listings" });
+  }
+};
+
+
+const getListingById = TryCatch(async (req, res, next) => {
+  const { id } = req.params;
+
+  // Fetch listing details
+  const listing = await Listing.findById(id);
+
+  if (!listing) {
+      return res.status(404).json({ success: false, message: "Listing not found" });
+  }
+  const reviews = await Review.find({ listing: id }).populate("user", "name email");
+  res.json({ success: true, data: { listing, reviews } });
+});
+
+
+
 
 // Get Listings for a Specific User
 const getUserListings = TryCatch(async (req, res, next) => {
-  console.log("req.user:", req.user);
+  const userId = req.user;
 
-  const userId = new mongoose.Types.ObjectId(req.user);
-  console.log("🔹 Converted userId:", userId);
-
+  if (!userId)
+    return next(
+      new ErrorHandler(401, "Unauthorized: Please login to view your listings")
+    );
   const page = parseInt(req.query.page) || 1;
   const limit = 10;
   const skip = (page - 1) * limit;
@@ -22,40 +49,15 @@ const getUserListings = TryCatch(async (req, res, next) => {
     .limit(limit)
     .populate("owner", "name email");
 
-  console.log("listings : ", listings);
-
-  // Count Total Listings for Pagination
-  const totalListings = await Listing.countDocuments({ owner: userId });
-
   if (!listings.length) {
     return res.status(200).json({
       success: true,
       message: "No listings found",
       listings: [],
-      totalListings,
-      page,
     });
   }
 
-  res.status(200).json({ success: true, page, totalListings, listings });
-});
-
-// Get All Listings
-const getAllListings = TryCatch(async (req, res) => {
-  try {
-    const listings = await Listing.find({}); // Fetch all listings from the database
-    res
-      .status(200)
-      .json({ success: true, count: listings.length, data: listings });
-  } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Failed to retrieve listings",
-        error: error.message,
-      });
-  }
+  res.status(200).json({ success: true, page, listings });
 });
 
 // Create a New Listing
@@ -64,19 +66,19 @@ const createListing = TryCatch(async (req, res, next) => {
     title,
     description,
     price,
+    size,
+    floor,
     location,
     propertyType,
     amenities, // expecting a comma-separated string or an array
     rooms,
     beds,
     bathrooms,
-    availableFrom,
     lat, // latitude to create locationGeo
     lng, // longitude to create locationGeo
   } = req.body;
 
   const images = req.files;
-  const owner = await User.findOne({ _id: req.user });
 
   // Basic validations
   if (!title || !description || !price || !location || !propertyType) {
@@ -98,13 +100,7 @@ const createListing = TryCatch(async (req, res, next) => {
       )
     );
   }
-  if (owner.role !== "landlord" && owner.role !== "admin") {
-    return next(new ErrorHandler(400, "Please Update your role"));
-  }
 
-  if (!availableFrom) {
-    return next(new ErrorHandler(400, "Available From date is required"));
-  }
   // Upload images to Cloudinary
   const uploadedImages = await uploadFilesToCloudinary(images);
 
@@ -124,6 +120,8 @@ const createListing = TryCatch(async (req, res, next) => {
     title,
     description,
     price,
+    size,
+    floor,
     location,
     locationGeo,
     images: uploadedImages,
@@ -133,7 +131,7 @@ const createListing = TryCatch(async (req, res, next) => {
     rooms: rooms || 1,
     beds: beds || 1,
     bathrooms: bathrooms || 1,
-    availableFrom: new Date(availableFrom),
+    // rating and reviewsCount will use defaults (0)
   });
 
   res.status(201).json({ success: true, listing: newListing });
@@ -141,18 +139,46 @@ const createListing = TryCatch(async (req, res, next) => {
 
 // Search Query for Listings
 const searchListings = TryCatch(async (req, res, next) => {
-  const { date, city } = req.query;
+  const {
+    q,
+    priceMin,
+    priceMax,
+    location,
+    propertyType,
+    ratingMin,
+    amenities,
+  } = req.query;
 
   const filter = {};
 
-  // Fixing Date Filtering (Using availableFrom)
-  if (date) {
-    filter.availableFrom = { $lte: new Date(date) }; // Listing should be available on or before this date
+  if (q) {
+    filter.$or = [
+      { title: { $regex: q, $options: "i" } },
+      { description: { $regex: q, $options: "i" } },
+    ];
   }
 
-  // Fixing City Filtering (Using location)
-  if (city) {
-    filter.location = { $regex: city, $options: "i" }; // Case-insensitive location search
+  if (priceMin || priceMax) {
+    filter.price = {};
+    if (priceMin) filter.price.$gte = Number(priceMin);
+    if (priceMax) filter.price.$lte = Number(priceMax);
+  }
+
+  if (location) {
+    filter.location = { $regex: location, $options: "i" };
+  }
+
+  if (propertyType) {
+    filter.propertyType = propertyType; // exact match for property type
+  }
+
+  if (ratingMin) {
+    filter.rating = { $gte: Number(ratingMin) };
+  }
+
+  if (amenities) {
+    const amenityArray = amenities.split(",").map((a) => a.trim());
+    filter.amenities = { $all: amenityArray };
   }
 
   const listings = await Listing.find(filter).populate("owner", "name email");
@@ -266,8 +292,9 @@ const deleteListing = TryCatch(async (req, res, next) => {
 });
 
 export {
-  getUserListings,
   getAllListings,
+  getListingById,
+  getUserListings,
   createListing,
   updateListing,
   deleteListing,

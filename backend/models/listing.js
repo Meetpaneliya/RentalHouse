@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 
 const ListingSchema = new mongoose.Schema(
   {
@@ -17,9 +17,10 @@ const ListingSchema = new mongoose.Schema(
         required: true,
       },
     },
-    status: { type: String, default: "available" },
-    availableFrom: { type: Date, required: true },
-    price: { type: Number, required: true },
+    status: { type: String, default: "Available" },
+    price: { type: Number ,required: true},
+    size: { type: Number},
+    floor: { type: Number },
     location: { type: String, required: true },
     images: [
       {
@@ -35,7 +36,7 @@ const ListingSchema = new mongoose.Schema(
     // Additional fields for a rental hotel website
     propertyType: {
       type: String,
-      enum: ["hotel", "apartment", "hostel", "bed and breakfast", "villa"],
+      enum: ["hotel", "apartment"],
       required: true,
     },
     amenities: [{ type: String }],

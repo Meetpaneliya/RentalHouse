@@ -3,14 +3,15 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Home } from "./pages/Home";
 import SignupPage from "./pages/Register";
 import LoginPage from "./pages/Login";
-import axios from "axios";
 import "./index.css";
 import Rooms from "./pages/Rooms";
-import { server } from "./lib/config";
+import Favorites from "./pages/Favorites";
 import Listings from "./pages/Listings";
+import ListingForm from "./pages/ListingForm";
 import { useDispatch, useSelector } from "react-redux";
 import { login, logout } from "./redux/reducers/Auth";
-import Profile from "./pages/Profile";
+import AboutUs from "./components/AboutUs";
+import ContactUs from "./components/ContactUs";
 import { Toaster } from "react-hot-toast";
 import { useMyprofileQuery } from "./redux/APi/api";
 import ForgotPassword from "./components/auth/ForgotPasswordForm";
@@ -23,7 +24,7 @@ function App() {
   const dispatch = useDispatch();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
-  const { data, error, isLoading } = useMyprofileQuery();
+  const { data, error } = useMyprofileQuery();
   const timeoutRef = useRef(null);
   useEffect(() => {
     if (data && data.user) {
@@ -37,10 +38,8 @@ function App() {
     if (!isAuthenticated && !timeoutRef.current) {
       timeoutRef.current = setTimeout(() => {
         setShowLoginModal(true);
-      }, 15000);
-    }
-
-    if (isAuthenticated) {
+      });
+    } else {
       setShowLoginModal(false);
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
@@ -67,8 +66,17 @@ function App() {
           />
 
           <Route path="/signup" element={<SignupPage />} />
-
           <Route path="/login" element={<LoginPage />} />
+
+          <Route path="/filtered-listings" element={<Listings />} />
+          <Route path="/room/:id" element={<Rooms />} />
+          <Route path="/ListingForm" element={<ListingForm />} />
+
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/contact" element={<ContactUs />} />
+
+          <Route path="/favorites/:id" element={<Favorites />} />
+
           <Route path="/forget-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/profile" element={() => <Profile />} />

@@ -19,7 +19,8 @@ export const protect = TryCatch(async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, "tempsecret");
-    req.user = decoded._id;
+    req.user = await User.findById(decoded._id).select("-password");
+    //req.user = decoded._id;
 
     if (!req.user) {
       return next(new ErrorHandler(401, "User not found"));

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, redirect, useNavigate } from "react-router-dom";
 import { Menu, X, User } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useAsyncMutation } from "../hooks/useError";
 import { useLogoutuserMutation } from "../redux/APi/api";
 

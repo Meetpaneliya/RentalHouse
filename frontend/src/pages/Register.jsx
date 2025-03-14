@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { FaEye, FaEyeSlash, FaApple, FaGoogle, FaTimes } from "react-icons/fa";
-//import { server } from "../lib/config";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { login } from "../redux/reducers/Auth";

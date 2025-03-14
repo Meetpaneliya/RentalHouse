@@ -14,8 +14,7 @@ dotenv.config({ path: "./.env" });
 
 export const envMode = process.env.NODE_ENV || "DEVELOPMENT";
 const port = process.env.PORT || 4000;
-const mongoURI = process.env.MONGO_URI || "mongodb+srv://jenil1234:jenil1234@cluster0.plnld.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-
+const mongoURI = process.env.MONGO_URI || "mongodb://localhost:27017";
 // Connect to MongoDB
 connectDB(mongoURI);
 
@@ -49,6 +48,8 @@ app.use(morgan("dev"));
 // Import Routes
 import userRoutes from "./routes/userRoutes.js";
 import listingRoutes from "./routes/listingRoutes.js";
+import favoriteRotes from "./routes/favoriteRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
 
 // Error Middleware
 app.use(errorMiddleware);
@@ -56,6 +57,8 @@ app.use(errorMiddleware);
 // API Routes
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/listings", listingRoutes);
+app.use("/api/v1/favorites", favoriteRotes);
+app.use("/api/v1/reviews", reviewRoutes);
 
 // Default Route
 app.get("/", (req, res) => {
