@@ -23,7 +23,7 @@ function App() {
   const dispatch = useDispatch();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
-  const { data, error, isLoading } = useMyprofileQuery();
+  const { data, error } = useMyprofileQuery();
   const timeoutRef = useRef(null);
   useEffect(() => {
     if (data && data.user) {
