@@ -29,6 +29,9 @@ const getListingById = TryCatch(async (req, res, next) => {
   res.json({ success: true, data: { listing, reviews } });
 });
 
+
+
+
 // Get Listings for a Specific User
 const getUserListings = TryCatch(async (req, res, next) => {
   const userId = req.user;
@@ -41,7 +44,6 @@ const getUserListings = TryCatch(async (req, res, next) => {
   const limit = 10;
   const skip = (page - 1) * limit;
 
-  const listings = await Listing.find({ owner: userId })
   const listings = await Listing.find({ owner: userId })
     .skip(skip)
     .limit(limit)
@@ -72,13 +74,11 @@ const createListing = TryCatch(async (req, res, next) => {
     rooms,
     beds,
     bathrooms,
-    availableFrom,
     lat, // latitude to create locationGeo
     lng, // longitude to create locationGeo
   } = req.body;
 
   const images = req.files;
-  const owner = await User.findOne({ _id: req.user });
 
   // Basic validations
   if (!title || !description || !price || !location || !propertyType) {
@@ -100,13 +100,7 @@ const createListing = TryCatch(async (req, res, next) => {
       )
     );
   }
-  if (owner.role !== "landlord" && owner.role !== "admin") {
-    return next(new ErrorHandler(400, "Please Update your role"));
-  }
 
-  if (!availableFrom) {
-    return next(new ErrorHandler(400, "Available From date is required"));
-  }
   // Upload images to Cloudinary
   const uploadedImages = await uploadFilesToCloudinary(images);
 
@@ -137,7 +131,7 @@ const createListing = TryCatch(async (req, res, next) => {
     rooms: rooms || 1,
     beds: beds || 1,
     bathrooms: bathrooms || 1,
-    availableFrom: new Date(availableFrom),
+    // rating and reviewsCount will use defaults (0)
   });
 
   res.status(201).json({ success: true, listing: newListing });
@@ -145,18 +139,46 @@ const createListing = TryCatch(async (req, res, next) => {
 
 // Search Query for Listings
 const searchListings = TryCatch(async (req, res, next) => {
-  const { date, city } = req.query;
+  const {
+    q,
+    priceMin,
+    priceMax,
+    location,
+    propertyType,
+    ratingMin,
+    amenities,
+  } = req.query;
 
   const filter = {};
 
-  // Fixing Date Filtering (Using availableFrom)
-  if (date) {
-    filter.availableFrom = { $lte: new Date(date) }; // Listing should be available on or before this date
+  if (q) {
+    filter.$or = [
+      { title: { $regex: q, $options: "i" } },
+      { description: { $regex: q, $options: "i" } },
+    ];
   }
 
-  // Fixing City Filtering (Using location)
-  if (city) {
-    filter.location = { $regex: city, $options: "i" }; // Case-insensitive location search
+  if (priceMin || priceMax) {
+    filter.price = {};
+    if (priceMin) filter.price.$gte = Number(priceMin);
+    if (priceMax) filter.price.$lte = Number(priceMax);
+  }
+
+  if (location) {
+    filter.location = { $regex: location, $options: "i" };
+  }
+
+  if (propertyType) {
+    filter.propertyType = propertyType; // exact match for property type
+  }
+
+  if (ratingMin) {
+    filter.rating = { $gte: Number(ratingMin) };
+  }
+
+  if (amenities) {
+    const amenityArray = amenities.split(",").map((a) => a.trim());
+    filter.amenities = { $all: amenityArray };
   }
 
   const listings = await Listing.find(filter).populate("owner", "name email");

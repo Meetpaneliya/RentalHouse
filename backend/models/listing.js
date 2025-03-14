@@ -17,7 +17,7 @@ const ListingSchema = new mongoose.Schema(
         required: true,
       },
     },
-    status: { type: String, default: "available" },
+    status: { type: String, default: "Available" },
     price: { type: Number ,required: true},
     size: { type: Number},
     floor: { type: Number },
@@ -36,7 +36,7 @@ const ListingSchema = new mongoose.Schema(
     // Additional fields for a rental hotel website
     propertyType: {
       type: String,
-      enum: ["hotel", "apartment", "hostel", "villa"],
+      enum: ["hotel", "apartment"],
       required: true,
     },
     amenities: [{ type: String }],

@@ -3,12 +3,6 @@ import { FaChevronDown } from "react-icons/fa";
 import { MdApartment, MdHotel } from "react-icons/md";
 
 const amenitiesList = ["WiFi", "AC", "Geyser", "More"];
-const sortByOptions = [
-  "Highest to Lowest Price",
-  "Lowest to Highest Price",
-  "Newest to Oldest",
-  "Oldest to Newest",
-];
 
 const FilterSection = ({ onFilterChange }) => {
   const [filters, setFilters] = useState({
@@ -17,7 +11,6 @@ const FilterSection = ({ onFilterChange }) => {
     bedrooms: 1,
     bathrooms: 1,
     listingId: "",
-    sortBy: "Newest to Oldest",
     availableOnly: false,
     amenities: [],
   });
@@ -30,7 +23,6 @@ const FilterSection = ({ onFilterChange }) => {
   const [showAmenitiesFilter, setShowAmenitiesFilter] = useState(false);
   const [showListingIdFilter, setShowListingIdFilter] = useState(false);
   const [showResetFilter, setShowResetFilter] = useState(false);
-  const [showSortByFilter, setShowSortByFilter] = useState(false);
   const [showAvailableFilter, setShowAvailableFilter] = useState(false);
 
   const priceFilterRef = useRef(null);
@@ -40,7 +32,6 @@ const FilterSection = ({ onFilterChange }) => {
   const amenitiesFilterRef = useRef(null);
   const listingIdFilterRef = useRef(null);
   const resetFilterRef = useRef(null);
-  const sortByFilterRef = useRef(null);
   const availableFilterRef = useRef(null);
 
   // Reset all filters
@@ -51,13 +42,12 @@ const FilterSection = ({ onFilterChange }) => {
       bedrooms: 1,
       bathrooms: 1,
       listingId: "",
-      sortBy: "Newest to Oldest",
       availableOnly: false,
       amenities: [],
     };
     setFilters(resetFilters);
     onFilterChange(resetFilters);
-    setIsResetChecked(false); 
+    setIsResetChecked(false);
   };
 
   // Handle input changes
@@ -99,14 +89,6 @@ const FilterSection = ({ onFilterChange }) => {
     });
   };
 
-  // Handle sort by selection
-  const handleSortByChange = (option) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      sortBy: option,
-    }));
-  };
-
   // Handle available only toggle
   const handleAvailableChange = () => {
     setFilters((prevFilters) => ({
@@ -126,7 +108,6 @@ const FilterSection = ({ onFilterChange }) => {
         amenitiesFilterRef,
         listingIdFilterRef,
         resetFilterRef,
-        sortByFilterRef,
         availableFilterRef,
       ];
       const states = [
@@ -137,7 +118,6 @@ const FilterSection = ({ onFilterChange }) => {
         setShowAmenitiesFilter,
         setShowListingIdFilter,
         setShowResetFilter,
-        setShowSortByFilter,
         setShowAvailableFilter,
       ];
 
@@ -253,22 +233,20 @@ const FilterSection = ({ onFilterChange }) => {
           <div className="absolute left-0 mt-3 w-80 bg-white shadow-xl rounded-lg p-6 z-50 border border-gray-300">
             <div className="flex justify-between items-center mb-4">
               <div
-                className={`w-1/2 p-4 border rounded-lg flex flex-col items-center cursor-pointer ${
-                  filters.propertyType === "Apartment" ? "bg-blue-100" : "hover:bg-gray-100"
-                }`}
+                className={`w-1/2 p-4 border rounded-lg flex flex-col items-center cursor-pointer ${filters.propertyType === "Apartment" ? "bg-blue-100" : "hover:bg-gray-100"
+                  }`}
                 onClick={() => handlePropertyTypeSelect("Apartment")}
               >
                 <MdApartment className="text-3xl text-indigo-800" />
                 <span className="mt-2 font-medium">Apartment</span>
               </div>
               <div
-                className={`w-1/2 p-4 border rounded-lg flex flex-col items-center cursor-pointer ${
-                  filters.propertyType === "Bedroom" ? "bg-blue-100" : "hover:bg-gray-100"
-                }`}
+                className={`w-1/2 p-4 border rounded-lg flex flex-col items-center cursor-pointer ${filters.propertyType === "Bedroom" ? "bg-blue-100" : "hover:bg-gray-100"
+                  }`}
                 onClick={() => handlePropertyTypeSelect("Bedroom")}
               >
                 <MdHotel className="text-3xl text-indigo-800" />
-                <span className="mt-2 font-medium">Bedroom</span>
+                <span className="mt-2 font-medium">Hotel</span>
               </div>
             </div>
             <p className="text-xs text-gray-500 mb-4 text-center">
@@ -406,66 +384,29 @@ const FilterSection = ({ onFilterChange }) => {
         )}
       </div>
 
-    {/* Reset Filter */}
-<div className="relative" ref={resetFilterRef}>
-  <button
-    onClick={() => setShowResetFilter(!showResetFilter)}
-    className="px-4 py-2 border rounded-full shadow text-black flex items-center space-x-2 cursor-pointer hover:bg-gray-100"
-  >
-    <span>Reset</span>
-    <FaChevronDown className="text-black" />
-  </button>
-  {showResetFilter && (
-    <div className="absolute left-0 mt-3 w-80 bg-white shadow-xl rounded-lg p-6 z-50 border border-gray-300">
-      <label className="flex items-center space-x-3 cursor-pointer">
-        <input
-          type="checkbox"
-          checked={isResetChecked}
-          onChange={() => setIsResetChecked(!isResetChecked)} // Toggle checkbox state
-          className="form-checkbox h-5 w-5 text-blue-600 rounded"
-        />
-        <span className="text-indigo-700 font-semibold text-lg">Reset Filters</span>
-      </label>
-      <button
-        className="w-full mt-4 bg-indigo-800 text-white py-2 rounded-lg hover:bg-indigo-900"
-        onClick={handleResetFilters} // Reset filters on click
-      >
-        Apply
-      </button>
-    </div>
-  )}
-</div>
-
-
-      {/* Sort By Filter */}
-      <div className="relative" ref={sortByFilterRef}>
+      {/* Reset Filter */}
+      <div className="relative" ref={resetFilterRef}>
         <button
-          onClick={() => setShowSortByFilter(!showSortByFilter)}
+          onClick={() => setShowResetFilter(!showResetFilter)}
           className="px-4 py-2 border rounded-full shadow text-black flex items-center space-x-2 cursor-pointer hover:bg-gray-100"
         >
-          <span>Sort By</span>
+          <span>Reset</span>
           <FaChevronDown className="text-black" />
         </button>
-        {showSortByFilter && (
-          <div className="absolute left-0 mt-3 w-72 bg-white shadow-xl rounded-lg p-6 z-50 border border-gray-300">
-            <div className="space-y-3">
-              {sortByOptions.map((option, index) => (
-                <label key={index} className="flex items-center space-x-3 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="sortBy"
-                    value={option}
-                    checked={filters.sortBy === option}
-                    onChange={() => handleSortByChange(option)}
-                    className="form-radio h-5 w-5 text-indigo-800"
-                  />
-                  <span className="text-gray-700">{option}</span>
-                </label>
-              ))}
-            </div>
+        {showResetFilter && (
+          <div className="absolute left-0 mt-3 w-80 bg-white shadow-xl rounded-lg p-6 z-50 border border-gray-300">
+            <label className="flex items-center space-x-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isResetChecked}
+                onChange={() => setIsResetChecked(!isResetChecked)} // Toggle checkbox state
+                className="form-checkbox h-5 w-5 text-blue-600 rounded"
+              />
+              <span className="text-indigo-700 font-semibold text-lg">Reset Filters</span>
+            </label>
             <button
               className="w-full mt-4 bg-indigo-800 text-white py-2 rounded-lg hover:bg-indigo-900"
-              onClick={() => setShowSortByFilter(false)}
+              onClick={handleResetFilters} // Reset filters on click
             >
               Apply
             </button>
