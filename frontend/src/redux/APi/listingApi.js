@@ -34,7 +34,7 @@ export const listingAPI = createApi({
     getAllListings: builder.query({
       query: () => ({
         method: "GET",
-        url: `/listings/all-listings`,
+        url: `/listings/all`,
         credentials: "include",
       }),
       providesTags: ["Listing"],

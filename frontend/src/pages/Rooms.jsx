@@ -15,7 +15,7 @@ const Rooms = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+  const [ setSuccessMessage] = useState("");
 
 
   useEffect(() => {

@@ -6,8 +6,8 @@ import CitySearch from "../components/citysearch";
 import FeaturesSection from "../components/Features";
 import Footer from "../components/Footer";
 import Sliderinfo from "../components/Sliderinfo";
-import LoginPage from "./Login";
-import SignupPage from "./Register";
+import LoginPage from "../components/auth/LoginForm";
+import SignupPage from "../components/auth/RegisterForm";
 
 
 export const Home = () => {

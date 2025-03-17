@@ -5,7 +5,7 @@ import { uploadFilesToCloudinary } from "../lib/helpers.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import cloudinary from "cloudinary";
 
- const getAllListings = async (req, res) => {
+const getAllListings = async (req, res) => {
   try {
     const listings = await Listing.find(); // Fetch all listings from DB
     res.status(200).json(listings);
@@ -14,7 +14,6 @@ import cloudinary from "cloudinary";
     res.status(500).json({ message: "Error fetching listings" });
   }
 };
-
 
 const getListingById = TryCatch(async (req, res, next) => {
   const { id } = req.params;
@@ -28,9 +27,6 @@ const getListingById = TryCatch(async (req, res, next) => {
   const reviews = await Review.find({ listing: id }).populate("user", "name email");
   res.json({ success: true, data: { listing, reviews } });
 });
-
-
-
 
 // Get Listings for a Specific User
 const getUserListings = TryCatch(async (req, res, next) => {

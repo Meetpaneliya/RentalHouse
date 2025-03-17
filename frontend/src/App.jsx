@@ -1,23 +1,23 @@
 import React, { useEffect, useRef, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Home } from "./pages/Home";
-import SignupPage from "./pages/Register";
-import LoginPage from "./pages/Login";
+import SignupPage from "./components/auth/RegisterForm";
+import LoginPage from "./components/auth/LoginForm";
 import "./index.css";
 import Rooms from "./pages/Rooms";
-import Favorites from "./pages/Favorites";
-import Listings from "./pages/Listings";
-import ListingForm from "./pages/ListingForm";
+import Favorites from "./components/listings/Favoritelist";
+//import Listings from "./pages/Listings";
+import FilterSection from "./components/FilterSection";
+import ListingForm from "./components/listings/ListingForm";
 import { useDispatch, useSelector } from "react-redux";
 import { login, logout } from "./redux/reducers/Auth";
-import AboutUs from "./components/AboutUs";
-import ContactUs from "./components/ContactUs";
+import AboutUs from "./pages/AboutUs";
+import ContactUs from "./pages/ContactUs";
 import { Toaster } from "react-hot-toast";
 import { useMyprofileQuery } from "./redux/APi/api";
 import ForgotPassword from "./components/auth/ForgotPasswordForm";
 import ResetPassword from "./components/auth/ResetPasswordForm";
-import AboutUs from "./components/AboutUs";
-import ContactUs from "./components/ContactUs";
+
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.auth);
@@ -68,7 +68,7 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
 
-          <Route path="/filtered-listings" element={<Listings />} />
+          <Route path="/filtered-listings" element={<FilterSection />} />
           <Route path="/room/:id" element={<Rooms />} />
           <Route path="/ListingForm" element={<ListingForm />} />
 
@@ -80,10 +80,6 @@ function App() {
           <Route path="/forget-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/profile" element={() => <Profile />} />
-          <Route path="/room/:id" element={<Rooms />} />
-          <Route path="/listings" element={<Listings />} />
-          <Route path="/about" element={<AboutUs />} />
-          <Route path="/contact" element={<ContactUs />} />
         </Routes>
 
         {/* Modal Overlays */}

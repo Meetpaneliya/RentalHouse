@@ -3,7 +3,7 @@ import { FaEye, FaEyeSlash, FaGoogle, FaApple, FaTimes } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { login } from "../redux/reducers/Auth";
+import { login } from "../../redux/reducers/Auth";
 import { Link } from "react-router-dom";
 
 export default function LoginPage({ onClose, setShowSignupModal }) {

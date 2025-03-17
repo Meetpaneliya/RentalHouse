@@ -1,20 +1,33 @@
 import React, { useState } from "react";
-import { Link, redirect, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, User } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
-import { useAsyncMutation } from "../hooks/useError";
+import { logout } from "../redux/slices/authSlice.jsx"; // Adjust the path as needed
+import { toast } from "react-toastify";
 import { useLogoutuserMutation } from "../redux/APi/api";
+import "react-toastify/dist/ReactToastify.css";
 
 const Navbar = ({ setShowLoginModal, setShowSignupModal }) => {
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { isAuthenticated, user } = useSelector((state) => state.auth);
-  const [loggingout, isloggingOut] = useAsyncMutation(useLogoutuserMutation);
+  
+  const [logoutUser, { isLoading: isloggingOut }] = useLogoutuserMutation();
 
   const handleLogout = async () => {
-    await loggingout("Logging Out", true);
-    dispatch(logout());
-    redirect("/");
+    try {
+      await logoutUser().unwrap();
+      dispatch(logout());
+      toast.success("Logout Successfully.")
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Failed to log out.");
+    }
   };
+
 
   return (
     <header className="bg-transparent text-white shadow-md">
@@ -29,7 +42,7 @@ const Navbar = ({ setShowLoginModal, setShowSignupModal }) => {
           <Link to="/about" className="hover:text-gray-400">
             About
           </Link>
-          <Link to="/cities" className="hover:text-gray-400">
+          <Link to="/filtered-listings" className="hover:text-gray-400">
             Cities
           </Link>
           <Link to="/contact" className="hover:text-gray-400">
