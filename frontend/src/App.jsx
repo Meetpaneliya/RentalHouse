@@ -6,7 +6,6 @@ import LoginPage from "./components/auth/LoginForm";
 import "./index.css";
 import Rooms from "./pages/Rooms";
 import Favorites from "./components/listings/Favoritelist";
-//import Listings from "./pages/Listings";
 import FilterSection from "./components/FilterSection";
 import ListingForm from "./components/listings/ListingForm";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,6 +16,7 @@ import { Toaster } from "react-hot-toast";
 import { useMyprofileQuery } from "./redux/APi/api";
 import ForgotPassword from "./components/auth/ForgotPasswordForm";
 import ResetPassword from "./components/auth/ResetPasswordForm";
+import FAQSection from "./pages/FAQSection";
 
 
 function App() {
@@ -71,15 +71,19 @@ function App() {
           <Route path="/filtered-listings" element={<FilterSection />} />
           <Route path="/room/:id" element={<Rooms />} />
           <Route path="/ListingForm" element={<ListingForm />} />
+          <Route path="/favorites/:id" element={<Favorites />} />
 
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
+          <Route path="/faq" element={<FAQSection/>}/>
 
-          <Route path="/favorites/:id" element={<Favorites />} />
-
+          
           <Route path="/forget-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/profile" element={() => <Profile />} />
+
+      
+          
         </Routes>
 
         {/* Modal Overlays */}
