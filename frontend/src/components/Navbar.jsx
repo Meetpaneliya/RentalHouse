@@ -39,14 +39,17 @@ const Navbar = ({ setShowLoginModal, setShowSignupModal }) => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
-          <Link to="/about" className="hover:text-gray-400">
+          <Link to="/about" className="hover:text-gray-300">
             About
           </Link>
-          <Link to="/filtered-listings" className="hover:text-gray-400">
+          <Link to="/filtered-listings" className="hover:text-gray-300">
             Cities
           </Link>
-          <Link to="/contact" className="hover:text-gray-400">
+          <Link to="/contact" className="hover:text-gray-300">
             Contact
+          </Link>
+          <Link to="/faq" className="block hover:text-gray-300">
+            FAQ's
           </Link>
         </nav>
 
@@ -77,13 +80,13 @@ const Navbar = ({ setShowLoginModal, setShowSignupModal }) => {
           <div className="hidden md:flex items-center space-x-4">
             <button
               onClick={() => setShowLoginModal(true)}
-              className="hover:text-gray-400"
+              className="bg-gray-500/35 px-4 py-2 rounded-3xl hover:bg-gray-700 transition"
             >
               Login
             </button>
             <button
               onClick={() => setShowSignupModal(true)}
-              className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-500 transition"
+              className="bg-blue-900 px-4 py-2 rounded-3xl hover:bg-blue-800 transition"
             >
               Sign Up
             </button>
@@ -114,6 +117,9 @@ const Navbar = ({ setShowLoginModal, setShowSignupModal }) => {
           </Link>
           <Link to="/contact" className="block hover:text-gray-400">
             Contact
+          </Link>
+          <Link to="/faq" className="block hover:text-gray-400">
+            FAQ's
           </Link>
 
           {!isAuthenticated ? (

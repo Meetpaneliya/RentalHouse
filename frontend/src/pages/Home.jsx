@@ -19,7 +19,7 @@ export const Home = () => {
             <div
                 className="relative w-full h-screen bg-cover"
                 style={{
-                    backgroundImage: `url('/assets/room1.jpg')`,
+                    backgroundImage: `url('/assets/room2.jpg')`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'
                 }}
@@ -37,7 +37,7 @@ export const Home = () => {
 
                 {/* bg content-1 */}
                 <div className="absolute inset-0 z-10 flex flex-col items-center justify-center space-y-6">
-                    <div className=" text-slate-200 text-center bg-purple-700/10 rounded-3xl p-10">
+                    <div className=" text-slate-200 text-center bg-gray-800 opacity-65 rounded-3xl p-10">
                         <h2 className="text-4xl font-bold">Ready, Set, Rent.</h2>
                         <p className="mt-4 text-lg">
                             Furnished and unfurnished apartments
