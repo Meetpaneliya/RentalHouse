@@ -16,6 +16,7 @@ const FilterSection = () => {
     bathrooms: 1,
     amenities: [],
     location: "",
+    rentalRoomName: ""
   });
 
   const [isResetChecked, setIsResetChecked] = useState(false); // ✅ Moved inside component
@@ -24,7 +25,7 @@ const FilterSection = () => {
   const [showBedroomsFilter, setShowBedroomsFilter] = useState(false);
   const [showBedBathFilter, setShowBedBathFilter] = useState(false);
   const [showAmenitiesFilter, setShowAmenitiesFilter] = useState(false);
-  const [showListingIdFilter, setShowListingIdFilter] = useState(false);
+  const [showRoomNameFilter, setshowRoomNameFilter] = useState(false);
   const [showResetFilter, setShowResetFilter] = useState(false);
   const [showAvailableFilter, setShowAvailableFilter] = useState(false);
 
@@ -36,35 +37,9 @@ const FilterSection = () => {
   const bedroomsFilterRef = useRef(null);
   const bedBathFilterRef = useRef(null);
   const amenitiesFilterRef = useRef(null);
-  const listingIdFilterRef = useRef(null);
+  const RoomNameFilterRef = useRef(null);
   const resetFilterRef = useRef(null);
   const availableFilterRef = useRef(null);
-
-  const handleResetFilters = () => {
-    const resetFilters = {
-      price: [500, 5000],
-      rooms: 1,
-      beds: 1,
-      bathrooms: 1,
-      amenities: [],
-      location: "",
-      propertyType: "",
-      availableOnly: false,
-    };
-    setFilters(resetFilters);
-    setIsResetChecked(false);
-  };
-
-  // Handle input changes
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    const updatedFilters = {
-      ...filters,
-      [name]: type === "checkbox" ? checked : value,
-    };
-    setFilters(updatedFilters);
-    //onFilterChange(updatedFilters);
-  };
 
   // Handle property type selection
   const handlePropertyTypeSelect = (type) => {
@@ -94,6 +69,14 @@ const FilterSection = () => {
     });
   };
 
+   // Filter listings by Room Title
+   const handleRoomTitleFilterChange = (e) => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      rentalRoomName: e.target.value,
+    }));
+  };
+
   // Handle available only toggle
   const handleAvailableChange = () => {
     setFilters((prevFilters) => ({
@@ -111,7 +94,7 @@ const FilterSection = () => {
         bedroomsFilterRef,
         bedBathFilterRef,
         amenitiesFilterRef,
-        listingIdFilterRef,
+        RoomNameFilterRef,
         resetFilterRef,
         availableFilterRef,
       ];
@@ -121,7 +104,7 @@ const FilterSection = () => {
         setShowBedroomsFilter,
         setShowBedBathFilter,
         setShowAmenitiesFilter,
-        setShowListingIdFilter,
+        setshowRoomNameFilter,
         setShowResetFilter,
         setShowAvailableFilter,
       ];
@@ -154,41 +137,73 @@ const FilterSection = () => {
 
 
   // Apply filtering only when filters change
-  useEffect(() => {
-    if (filters && Object.values(filters).some((val) => val)) { 
-      // If filters exist, apply filtering
-      const filtered = listings.filter((listing) => {
-        const withinPriceRange =
-          listing.price >= filters.price[0] && listing.price <= filters.price[1];
-        const matchesRooms = listing.rooms >= filters.rooms;
-        const matchesBeds = listing.beds >= filters.beds;
-        const matchesBathrooms = listing.bathrooms >= filters.bathrooms;
-        const matchesLocation = filters.location
-          ? listing.location.toLowerCase().includes(filters.location.toLowerCase())
-          : true;
-        const matchesAmenities = filters.amenities.every((amenity) =>
-          listing.amenities.includes(amenity)
-        );
-        const matchesPropertyType = filters.propertyType
-          ? listing.propertyType === filters.propertyType
-          : true;
-  
-        return (
-          withinPriceRange &&
-          matchesRooms &&
-          matchesBeds &&
-          matchesBathrooms &&
-          matchesLocation &&
-          matchesAmenities &&
-          matchesPropertyType
-        );
-      });
-  
-      setFilteredListings(filtered);
-    } else {
-      setFilteredListings(listings); // Show all listings if no filters applied
-    }
-  }, [filters, listings]); // listings dependency add kiya hai
+ useEffect(() => {
+  if (
+    filters &&
+    (
+      filters.rentalRoomName || 
+      filters.location || 
+      filters.propertyType || 
+      filters.amenities.length > 0 || 
+      filters.rooms !== 1 || 
+      filters.beds !== 1 || 
+      filters.bathrooms !== 1 || 
+      filters.price[0] !== 500 || 
+      filters.price[1] !== 5000
+    )
+  ) { 
+    // If filters exist, apply filtering on all listings
+    const filtered = listings.filter((listing) => {
+      const withinPriceRange =
+        listing.price >= filters.price[0] && listing.price <= filters.price[1];
+      const matchesRooms = listing.rooms >= filters.rooms;
+      const matchesBeds = listing.beds >= filters.beds;
+      const matchesBathrooms = listing.bathrooms >= filters.bathrooms;
+      const matchesLocation = filters.location
+        ? listing.location.toLowerCase().includes(filters.location.toLowerCase())
+        : true;
+      const matchesAmenities = filters.amenities.every((amenity) =>
+        listing.amenities.includes(amenity)
+      );
+      const matchesPropertyType = filters.propertyType
+        ? listing.propertyType === filters.propertyType
+        : true;
+      const matchesRentalRoomName = filters.rentalRoomName
+        ? listing.title.toLowerCase().includes(filters.rentalRoomName.toLowerCase())
+        : true;  
+
+      return (
+        withinPriceRange &&
+        matchesRooms &&
+        matchesBeds &&
+        matchesBathrooms &&
+        matchesLocation &&
+        matchesAmenities &&
+        matchesPropertyType &&
+        matchesRentalRoomName
+      );
+    });
+
+    setFilteredListings(filtered);
+  } else {
+    setFilteredListings([...listings]); 
+  }
+}, [filters, listings]);
+
+// ✅ Proper Reset Filters Function
+const handleResetFilters = () => {
+  setFilters({
+    price: [500, 5000],
+    rooms: 1,
+    beds: 1,
+    bathrooms: 1,
+    amenities: [],
+    location: "",
+    propertyType: "",
+    availableOnly: false,
+    rentalRoomName: ""
+  });
+};
 
   return (
     <div>
@@ -460,27 +475,27 @@ const FilterSection = () => {
           </div>
 
           {/* Listing ID Filter */}
-          <div className="relative" ref={listingIdFilterRef}>
+          <div className="relative" ref={RoomNameFilterRef}>
             <button
-              onClick={() => setShowListingIdFilter(!showListingIdFilter)}
+              onClick={() => setshowRoomNameFilter(!showRoomNameFilter)}
               className="px-4 py-2 border rounded-full shadow  text-black flex items-center space-x-2 cursor-pointer hover:bg-gray-100"
             >
-              <span>Listing ID</span>
+              <span>Listing Room</span>
               <FaChevronDown className="text-black" />
             </button>
-            {showListingIdFilter && (
+            {showRoomNameFilter && (
               <div className="absolute left-0 mt-3 w-80 bg-white shadow-xl rounded-lg p-6 z-50 border border-gray-300">
-                <h3 className="text-lg font-semibold mb-4 text-center">Listing ID</h3>
+                <h3 className="text-lg font-semibold mb-4 text-center">Listing Room</h3>
                 <input
                   type="text"
-                  value={filters.listingId}
-                  onChange={handleChange}
-                  placeholder="Enter Listing ID"
+                  value={filters.rentalRoomName}
+                  onChange={handleRoomTitleFilterChange}
+                  placeholder="Enter the Rental Room Name"
                   className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
                 />
                 <button
                   className="w-full mt-4 bg-indigo-800 text-white py-2 rounded-lg hover:bg-indigo-900"
-                  onClick={() => setShowListingIdFilter(false)}
+                  onClick={() => setshowRoomNameFilter(false)}
                 >
                   Apply
                 </button>

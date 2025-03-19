@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { useLogoutuserMutation } from "../redux/APi/api";
 import "react-toastify/dist/ReactToastify.css";
 
+
 const Navbar = ({ setShowLoginModal, setShowSignupModal }) => {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);

@@ -72,7 +72,7 @@ const Listings = ({ listings = [] }) => {
       </div>
 
       {/* Right Side: Map */}
-      <div className="w-full md:w-[40%] h-screen md:h-auto mt-4 md:mt-0">
+      <div className="w-full md:w-[40%] h-screen md:h-auto mt-4 md:mt-0 z-10">
         <MapContainer
           center={[40.7128, -74.006]} // Default center (New York)
           zoom={12}
