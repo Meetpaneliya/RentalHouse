@@ -21,24 +21,24 @@ const AboutUs = () => {
 
         {/* Content */}
         <div className="relative flex flex-col items-center justify-center h-full text-center px-6">
-          <h1 className="text-white text-6xl font-bold">
+          <h1 className="text-white text-4xl md:text-6xl font-bold">
             About <span className="text-gray-200">Us</span>
           </h1>
-          <p className="text-white text-lg max-w-2xl mt-4">
+          <p className="text-white text-lg max-w-2xl mt-4 px-4">
             To reinvent the antiquated housing experience for the new generation of renters and mom & pop landlords.
           </p>
         </div>
       </div>
 
       {/* Add Gap Below Hero Section */}
-      <div className="mt-20"></div> {/* ✅ Creates proper spacing before next section */}
+      <div className="mt-20"></div>
 
       {/* Two-Column Section */}
-      <div className="max-w-6xl mx-auto px-8">
+      <div className="max-w-6xl mx-auto px-4 md:px-8">
         {/* First Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-0 items-center ml-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
           {/* Text on the left */}
-          <div className="pr-8 text-left">
+          <div className="text-left px-4 md:pr-8">
             <h2 className="text-2xl font-bold text-gray-800">Simplicity at every step.</h2>
             <p className="text-gray-600 mt-4">
               We believe that renting a home should be easy, but it’s historically been an overly complicated 
@@ -48,28 +48,28 @@ const AboutUs = () => {
             </p>
           </div>
           {/* Image on the right */}
-          <div className="relative">
+          <div className="relative flex justify-center">
             <img
               src="/assets/about2.jpg"
               alt="Houses"
-              className="w-[530px] h-[400px] object-cover shadow-lg"
+              className="w-full max-w-[530px] h-auto object-cover shadow-lg"
             />
           </div>
         </div>
 
         {/* Second Row (Reversed Layout) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 items-center mt-[-5px] ml-4">
-          {/* Image on the left (Increase Size & Square) */}
-          <div className="relative">
+        <div className="grid grid-cols-1 md:grid-cols-2 items-center mt-10">
+          {/* Image on the left */}
+          <div className="relative flex justify-center">
             <img
               src="/assets/about1.jpg"
               alt="Customer Service"
-              className="w-[530px] h-[400px] object-cover shadow-lg"
+              className="w-full max-w-[530px] h-auto object-cover shadow-lg"
             />
           </div>
 
           {/* Text on the right */}
-          <div className="pl-8 text-left">
+          <div className="text-left px-4 md:pl-8 mt-6 md:mt-0">
             <h2 className="text-2xl font-bold text-gray-800">Best customer service</h2>
             <p className="text-gray-600 mt-4">
               At June, we take care of our residents and owners. Whether you’re a resident working with our 
@@ -80,30 +80,31 @@ const AboutUs = () => {
           </div>
         </div>
 
-        {/* Third Row (Reversed Layout) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 items-center mt-[30px]">
+        {/* Third Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 items-center mt-10">
           {/* Text on the left */}
-          <div className="pr-8 text-left">
+          <div className="text-left px-4 md:pr-8">
             <h2 className="text-2xl font-bold text-gray-800">Transparency in the rental</h2>
             <p className="text-gray-600 mt-4">
-              We never gate keep information and are always upfront and honest when it comes to 
+              We never gatekeep information and are always upfront and honest when it comes to 
               requirements and fees, listings and locations, and what you can expect as a June resident or owner. 
               In an industry peppered with shady characters and scams galore, we pride ourselves on maintaining 
               transparent and professional communication with our customers throughout the process.
             </p>
           </div>
 
-          {/* Image on the right (Slightly touching the above image) */}
-          <div className="relative -mt-[40px]">
+          {/* Image on the right */}
+          <div className="relative flex justify-center">
             <img
               src="/assets/about3.jpg"
               alt="Glass Building"
-              className="w-[530px] h-[400px] object-cover shadow-lg"
+              className="w-full max-w-[530px] h-auto object-cover shadow-lg"
             />
           </div>
         </div>
       </div>
-      <br></br><br></br>
+
+      <div className="mt-20"></div>
       <Footer/>
     </div>
   );

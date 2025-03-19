@@ -15,8 +15,7 @@ const Rooms = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
-  const [ setSuccessMessage] = useState("");
-
+  const [setSuccessMessage] = useState("");
 
   useEffect(() => {
     const fetchRoomDetails = async () => {
@@ -43,21 +42,19 @@ const Rooms = () => {
     fetchRoomDetails();
   }, [id]);
 
-
   const fetchReviews = async () => {
     try {
       const response = await axios.get(`http://localhost:4000/api/v1/reviews/${id}`);
-      setReviews(response.data.reviews); // ✅ Update state with new reviews
+      setReviews(response.data.reviews);
     } catch (err) {
       console.error("Error fetching reviews:", err);
     }
   };
 
   useEffect(() => {
-    fetchReviews(); // ✅ Fetch reviews when component loads
+    fetchReviews();
   }, [id]);
 
-  // Call fetchReviews() after submitting a review
   const submitReview = async () => {
     try {
       const response = await axios.post(
@@ -71,13 +68,12 @@ const Rooms = () => {
       setSuccessMessage("Review submitted successfully!");
       setIsModalOpen(false);
 
-      fetchReviews(); // ✅ Fetch updated reviews
+      fetchReviews();
     } catch (err) {
       console.error("Error adding review:", err);
       setError("Failed to submit review.");
     }
   };
-
 
   if (loading) return <p className="text-center text-gray-600">Loading...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
@@ -85,29 +81,28 @@ const Rooms = () => {
 
   return (
     <div className="">
-
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-blue-800">{room.title} - #{room._id}</h1>
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-blue-800">{room.title} - #{room._id}</h1>
         </div>
 
         {/* Image & Thumbnails */}
-        <div className="grid grid-cols-5 gap-4">
-          <div className="col-span-3">
+        <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
+          <div className="col-span-1 sm:col-span-3">
             <img
-              className="w-full h-96 object-cover rounded-xl shadow-md"
+              className="w-full h-64 sm:h-96 object-cover rounded-xl shadow-md"
               src={room.images[0]?.url}
               alt={room.title}
             />
           </div>
-          <div className="col-span-2 grid grid-cols-2 gap-2">
+          <div className="col-span-1 sm:col-span-2 grid grid-cols-2 gap-2">
             {room.images?.slice(1, 5).map((image, index) => (
               <img
                 key={index}
-                className="w-full h-36 object-cover rounded-lg hover:scale-105 transition"
+                className="w-full h-32 sm:h-36 object-cover rounded-lg hover:scale-105 transition"
                 src={image.url}
                 alt={`Thumbnail ${index + 1}`}
               />
@@ -116,9 +111,9 @@ const Rooms = () => {
         </div>
 
         {/* Overview & Booking Section */}
-        <div className="grid grid-cols-3 gap-6 mt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
           {/* Overview Section */}
-          <div className="col-span-2">
+          <div className="col-span-1 sm:col-span-2">
             <h2 className="text-2xl font-semibold">Overview</h2>
             <p className="text-gray-600">📏 {room.size} ft² | 🏢 {room.floor} Floor | 🛏 {room.beds} Beds | 🛁 {room.bathrooms} Bath</p>
             <p className="text-green-600 font-medium mt-1">📅 Available from {room.availableDate || "N/A"}</p>
@@ -127,7 +122,7 @@ const Rooms = () => {
             {/* Amenities */}
             <div className="mt-6 border-t pt-4">
               <h2 className="text-xl font-semibold">This place offers</h2>
-              <div className="grid grid-cols-3 gap-4 mt-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3">
                 {room.amenities?.map((amenity, index) => (
                   <div key={index} className="flex items-center space-x-2 text-gray-700">
                     <span className="text-blue-600">{amenity === "wifi" ? <FaWifi /> : amenity === "tv" ? <FaTv /> : amenity === "ac" ? <FaSnowflake /> : amenity === "geyser" ? <FaShower /> : null}</span>
@@ -183,7 +178,7 @@ const Rooms = () => {
 
         {/* Review Modal */}
         <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)} className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg w-96">
+          <div className="bg-white p-6 rounded-lg w-full sm:w-96">
             <h2 className="text-xl font-semibold">Add Your Review</h2>
             <div className="mt-3">
               <label className="block text-gray-700">Rating:</label>
@@ -213,47 +208,42 @@ const Rooms = () => {
         </Dialog>
       </div>
 
-      {/* Search CTA Section (with rounded corners and card effect) */}
+      {/* Search CTA Section */}
       <div
-        className="relative -mb-40 bg-cover bg-center text-white py-10 px-6 w-full max-w-5xl mx-auto rounded-3xl shadow-lg overflow-hidden"
+        className="relative -mb-40 bg-cover bg-center text-white py-10 px-4 sm:px-6 w-full max-w-5xl mx-auto rounded-3xl shadow-lg overflow-hidden"
         style={{
           backgroundImage: "url('/assets/girlroom.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          height: '300px', // Reduced height
-          maxHeight: '300px' // Added max-height constraint
+          height: '300px',
+          maxHeight: '300px'
         }}
       >
-
-        <div className="z-10 flex justify-between items-center max-w-5xl mx-auto">
-          <div className="gap-3 p-5 w-2/6  bg-white/70 rounded-3xl">
-            <h2 className="text-4xl font-bold text-blue-800 text-center">Start your search today</h2>
+        <div className="z-10 flex flex-col sm:flex-row justify-between items-center max-w-5xl mx-auto">
+          <div className="gap-3 p-5 w-full sm:w-2/6 bg-white/70 rounded-3xl">
+            <h2 className="text-2xl sm:text-4xl font-bold text-blue-800 text-center">Start your search today</h2>
             <p className="mt-3 text-sm text-blue-800">
               Get ready for the easiest rental experience of your life. Browse homes, take a tour,
               submit an application, and get your key in a few clicks!
             </p>
           </div>
 
-
-          <div className="flex flex-col space-y-10">
+          <div className="flex flex-col space-y-4 sm:space-y-10 mt-4 sm:mt-0">
             <button className="">
-              <a href="/search" className="bg-blue-500/50 hover:bg-blue-600 text-white px-10 py-3 rounded-full">Search Apartments</a>
+              <a href="/search" className="bg-blue-500/50 hover:bg-blue-600 text-white px-6 sm:px-10 py-2 sm:py-3 rounded-full">Search Apartments</a>
             </button>
 
             <button>
-              <a href="/signup" className="bg-blue-500/50 hover:bg-blue-600 text-white px-10 py-3 rounded-full">Speak to a Human</a>
+              <a href="/signup" className="bg-blue-500/50 hover:bg-blue-600 text-white px-6 sm:px-10 py-2 sm:py-3 rounded-full">Speak to a Human</a>
             </button>
           </div>
-
         </div>
       </div>
 
       <div>
         <Footer />
       </div>
-
     </div>
   );
 };
 
-export default Rooms;
