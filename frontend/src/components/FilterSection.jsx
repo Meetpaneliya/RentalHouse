@@ -137,58 +137,41 @@ const FilterSection = () => {
 
 
   // Apply filtering only when filters change
- useEffect(() => {
-  if (
-    filters &&
-    (
-      filters.rentalRoomName || 
-      filters.location || 
-      filters.propertyType || 
-      filters.amenities.length > 0 || 
-      filters.rooms !== 1 || 
-      filters.beds !== 1 || 
-      filters.bathrooms !== 1 || 
-      filters.price[0] !== 500 || 
-      filters.price[1] !== 5000
-    )
-  ) { 
-    // If filters exist, apply filtering on all listings
-    const filtered = listings.filter((listing) => {
-      const withinPriceRange =
-        listing.price >= filters.price[0] && listing.price <= filters.price[1];
-      const matchesRooms = listing.rooms >= filters.rooms;
-      const matchesBeds = listing.beds >= filters.beds;
-      const matchesBathrooms = listing.bathrooms >= filters.bathrooms;
-      const matchesLocation = filters.location
-        ? listing.location.toLowerCase().includes(filters.location.toLowerCase())
-        : true;
-      const matchesAmenities = filters.amenities.every((amenity) =>
-        listing.amenities.includes(amenity)
-      );
-      const matchesPropertyType = filters.propertyType
-        ? listing.propertyType === filters.propertyType
-        : true;
-      const matchesRentalRoomName = filters.rentalRoomName
-        ? listing.title.toLowerCase().includes(filters.rentalRoomName.toLowerCase())
-        : true;  
 
-      return (
-        withinPriceRange &&
-        matchesRooms &&
-        matchesBeds &&
-        matchesBathrooms &&
-        matchesLocation &&
-        matchesAmenities &&
-        matchesPropertyType &&
-        matchesRentalRoomName
-      );
-    });
-
-    setFilteredListings(filtered);
-  } else {
-    setFilteredListings([...listings]); 
-  }
-}, [filters, listings]);
+  useEffect(() => {
+    if (
+      filters &&
+      (
+        filters.rentalRoomName ||
+        filters.location ||
+        filters.propertyType ||
+        filters.amenities.length > 0 ||
+        filters.rooms > 1 || // Updated condition
+        filters.beds > 1 || // Updated condition
+        filters.bathrooms > 1 || // Updated condition
+        filters.price[0] !== 500 ||
+        filters.price[1] !== 5000
+      )
+    ) {
+      const filtered = listings.filter((listing) => {
+        return (
+          listing.price >= filters.price[0] && listing.price <= filters.price[1] &&
+          listing.rooms >= filters.rooms &&
+          listing.beds >= filters.beds &&
+          listing.bathrooms >= filters.bathrooms &&
+          (!filters.location || listing.location.toLowerCase().includes(filters.location.toLowerCase())) &&
+          (!filters.propertyType || listing.propertyType === filters.propertyType) &&
+          (!filters.rentalRoomName || listing.title.toLowerCase().includes(filters.rentalRoomName.toLowerCase())) &&
+          (filters.amenities.length === 0 || filters.amenities.some((amenity) => listing.amenities.includes(amenity))) // Updated condition
+        );
+      });
+      console.log("filterd listing: ", filtered);
+      
+      setFilteredListings(filtered);
+    } else {
+      setFilteredListings([...listings]);
+    }
+  }, [filters, listings]);
 
 // ✅ Proper Reset Filters Function
 const handleResetFilters = () => {

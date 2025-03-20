@@ -5,7 +5,7 @@ import Navbar from "../components/Navbar2";
 import { FaWifi, FaTv, FaSnowflake, FaShower, FaStar } from "react-icons/fa";
 import Footer from "../components/Footer";
 import { Dialog } from "@headlessui/react";
-import { server } from "../lib/config";
+import { FaShareSquare } from "react-icons/fa";
 
 const Rooms = () => {
   const { id } = useParams();
@@ -78,15 +78,24 @@ const Rooms = () => {
       setError("Failed to submit review.");
     }
   };
-  const handleCheckout = (amount) => {
-    navigate("/payment", {
-      state: {
-        amount,
-        currency: "usd",
-        room,
-      },
-    });
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Check this out!",
+          text: "Hey, take a look at this amazing content!",
+          url: window.location.href, // Current page URL
+        });
+        console.log("Content shared successfully");
+      } catch (error) {
+        console.error("Error sharing:", error);
+      }
+    } else {
+      alert("Web Share API is not supported in your browser.");
+    }
   };
+
   if (loading) return <p className="text-center text-gray-600">Loading...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
   if (!room)
@@ -104,6 +113,7 @@ const Rooms = () => {
           <h1 className="text-2xl sm:text-3xl font-bold text-blue-800">
             {room.title} - #{room._id}
           </h1>
+          <FaShareSquare onClick={handleShare} className="text-2xl" />
         </div>
 
         {/* Image & Thumbnails */}
@@ -229,20 +239,6 @@ const Rooms = () => {
             <p className="text-gray-500 text-sm text-center mt-2">
               You won't get charged yet
             </p>
-            <button
-              onClick={() =>
-                handleCheckout(
-                  Math.round(
-                    room.price -
-                      Math.floor(room.price * 0.1) +
-                      Math.floor(room.price * 0.05)
-                  )
-                )
-              }
-              className="mt-4 w-full px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
-              Checkout
-            </button>
           </div>
         </div>
 
@@ -339,6 +335,7 @@ const Rooms = () => {
         </div>
       </div>
 
+      {/* Footer */}
       <div>
         <Footer />
       </div>

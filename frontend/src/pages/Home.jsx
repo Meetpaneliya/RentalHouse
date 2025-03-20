@@ -37,7 +37,7 @@ export const Home = () => {
 
                 {/* Content */}
                 <div className="absolute inset-0 z-10 flex flex-col items-center justify-center space-y-6 px-4">
-                    <div className="text-slate-200 text-center bg-purple-700/10 rounded-3xl p-6 sm:p-10 w-full max-w-lg">
+                    <div className="text-slate-200 text-center bg-gray-800/30 rounded-3xl p-5 sm:p-10 w-full max-w-lg">
                         <h2 className="text-2xl sm:text-4xl font-bold">Ready, Set, Rent.</h2>
                         <p className="mt-2 sm:mt-4 text-base sm:text-lg">
                             Furnished and unfurnished apartments <br />
