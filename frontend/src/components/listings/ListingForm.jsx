@@ -6,8 +6,8 @@ const ListingForm = () => {
     title: "",
     description: "",
     price: "",
-    size:"",
-    floor:"",
+    size: "",
+    floor: "",
     location: "",
     propertyType: "",
     amenities: "",
@@ -18,49 +18,43 @@ const ListingForm = () => {
     lng: "",
   });
 
-  const [images, setImages] = useState([]); // ✅ Ensures images array exists
+  const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [ message ] = useState("");
+  const [message, setMessage] = useState("");
 
-  // Handle input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle image selection
   const handleImageChange = (e) => {
     const fileArray = Array.from(e.target.files);
     const imagePreviews = fileArray.map((file) => ({
-      url: URL.createObjectURL(file), // ✅ Creates preview URL
-      file, // ✅ Stores actual file for upload
+      url: URL.createObjectURL(file),
+      file,
     }));
     setImages(imagePreviews);
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
       const submitData = new FormData();
-
-      // Append form fields
       Object.entries(formData).forEach(([key, value]) => {
         submitData.append(key, value);
       });
 
-      // Append images
       images.forEach((image) => {
-        submitData.append("images", image.file); // ✅ Upload actual file
+        submitData.append("images", image.file);
       });
 
       const response = await axios.post(
-        "http://localhost:4000/api/v1/listings/create", // Backend API
+        "http://localhost:4000/api/v1/listings/create",
         submitData,
         {
           headers: { "Content-Type": "multipart/form-data" },
-          withCredentials: true, // If using cookies for auth
+          withCredentials: true,
         }
       );
 
@@ -75,176 +69,185 @@ const ListingForm = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
-      <h2 className="text-3xl font-bold text-center text-blue-900 mb-6">
-        Add Your Rooms
-      </h2>
-
-      {message && <p className="text-center text-red-500 mb-4">{message}</p>}
-
-      <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-4">
+    <div
+      className="flex justify-center items-center min-h-screen bg-cover bg-center bg-no-repeat px-4 py-10"
+      style={{ backgroundImage: "url('/assets/room1.jpg')" }} // Replace with your actual image path
+    >
+      <div className="w-full max-w-4xl bg-white shadow-2xl rounded-3xl p-10 backdrop-blur-md bg-opacity-80 transition-all duration-300">
         {/* Title */}
-        <input
-          type="text"
-          name="title"
-          placeholder="Title"
-          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900"
-          onChange={handleChange}
-          required
-        />
+        <h2 className="text-4xl font-extrabold text-center text-indigo-800 mb-6">
+          Add Your Rooms 🏠
+        </h2>
 
-        {/* Description */}
-        <textarea
-          name="description"
-          placeholder="Description"
-          rows="4"
-          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900 "
-          onChange={handleChange}
-          required
-        ></textarea>
+        {message && <p className="text-center text-red-500 mb-4">{message}</p>}
 
-        {/* Price & Location */}
-        <div className="grid grid-cols-2 gap-4">
-          <input
-            type="number"
-            name="price"
-            placeholder="Price"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900 "
-            onChange={handleChange}
-            required
-          />
+        {/* Form Start */}
+        <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-6">
+          {/* Title */}
           <input
             type="text"
-            name="location"
-            placeholder="Location"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900 "
+            name="title"
+            placeholder="Enter Title"
+            className="w-full p-4 rounded-full bg-gray-100 focus:bg-white shadow-md focus:shadow-lg transition-all outline-none focus:ring-2 focus:ring-indigo-500"
             onChange={handleChange}
             required
           />
-        </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <input
-            type="number"
-            name="size"
-            placeholder="size"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900 "
+          {/* Description */}
+          <textarea
+            name="description"
+            placeholder="Enter Description"
+            rows="4"
+            className="w-full p-4 rounded-xl bg-gray-100 focus:bg-white shadow-md focus:shadow-lg transition-all outline-none focus:ring-2 focus:ring-indigo-500"
             onChange={handleChange}
             required
-          />
-          <input
-            type="number"
-            name="floor"
-            placeholder="floor"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900 "
-            onChange={handleChange}
-            required
-          />
-        </div>
+          ></textarea>
 
-        {/* Property Type & Amenities */}
-        <div className="grid grid-cols-2 gap-4">
-          <input
-            type="text"
-            name="propertyType"
-            placeholder="Property Type"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900"
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="text"
-            name="amenities"
-            placeholder="Amenities (comma separated)"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900 "
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Rooms, Beds, Bathrooms */}
-        <div className="grid grid-cols-3 gap-4">
-          <input
-            type="number"
-            name="rooms"
-            placeholder="Rooms"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900 "
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="number"
-            name="beds"
-            placeholder="Beds"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900"
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="number"
-            name="bathrooms"
-            placeholder="Bathrooms"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900"
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Latitude & Longitude */}
-        <div className="grid grid-cols-2 gap-4">
-          <input
-            type="text"
-            name="lat"
-            placeholder="Latitude"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900"
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="text"
-            name="lng"
-            placeholder="Longitude"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900"
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Image Upload */}
-        <div className="border p-4 rounded-lg">
-          <label className="block mb-2 text-gray-700">Upload Images</label>
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-900 focus:border-blue-900 cursor-pointer bg-gray-50"
-            onChange={handleImageChange}
-            required
-          />
-        </div>
-
-        {/* Image Preview */}
-        <div className="flex flex-wrap gap-2">
-          {images.map((image, index) => (
-            <img
-              key={index}
-              src={image.url || "https://via.placeholder.com/150"}
-              alt={`Preview ${index}`}
-              className="w-24 h-24 object-cover rounded-md"
+          {/* Price & Location */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <input
+              type="number"
+              name="price"
+              placeholder="Price ($)"
+              className="w-full p-4 rounded-full bg-gray-100 focus:bg-white shadow-md focus:shadow-lg transition-all outline-none focus:ring-2 focus:ring-indigo-500"
+              onChange={handleChange}
+              required
             />
-          ))}
-        </div>
+            <input
+              type="text"
+              name="location"
+              placeholder="Location"
+              className="w-full p-4 rounded-full bg-gray-100 focus:bg-white shadow-md focus:shadow-lg transition-all outline-none focus:ring-2 focus:ring-indigo-500"
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          className="w-full p-3 bg-blue-900 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400"
-          disabled={loading}
-        >
-          {loading ? "Submitting..." : "Submit Listing"}
-        </button>
-      </form>
+          {/* Size & Floor */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <input
+              type="number"
+              name="size"
+              placeholder="Size (sq ft)"
+              className="w-full p-4 rounded-full bg-gray-100 focus:bg-white shadow-md focus:shadow-lg transition-all outline-none focus:ring-2 focus:ring-indigo-500"
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="number"
+              name="floor"
+              placeholder="Floor"
+              className="w-full p-4 rounded-full bg-gray-100 focus:bg-white shadow-md focus:shadow-lg transition-all outline-none focus:ring-2 focus:ring-indigo-500"
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          {/* Property Type & Amenities */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <input
+              type="text"
+              name="propertyType"
+              placeholder="Property Type"
+              className="w-full p-4 rounded-full bg-gray-100 focus:bg-white shadow-md focus:shadow-lg transition-all outline-none focus:ring-2 focus:ring-indigo-500"
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="text"
+              name="amenities"
+              placeholder="Amenities (comma separated)"
+              className="w-full p-4 rounded-full bg-gray-100 focus:bg-white shadow-md focus:shadow-lg transition-all outline-none focus:ring-2 focus:ring-indigo-500"
+              onChange={handleChange}
+            />
+          </div>
+
+          {/* Rooms, Beds, Bathrooms */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <input
+              type="number"
+              name="rooms"
+              placeholder="Rooms"
+              className="w-full p-4 rounded-full bg-gray-100 focus:bg-white shadow-md focus:shadow-lg transition-all outline-none focus:ring-2 focus:ring-indigo-500"
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="number"
+              name="beds"
+              placeholder="Beds"
+              className="w-full p-4 rounded-full bg-gray-100 focus:bg-white shadow-md focus:shadow-lg transition-all outline-none focus:ring-2 focus:ring-indigo-500"
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="number"
+              name="bathrooms"
+              placeholder="Bathrooms"
+              className="w-full p-4 rounded-full bg-gray-100 focus:bg-white shadow-md focus:shadow-lg transition-all outline-none focus:ring-2 focus:ring-indigo-500"
+              onChange={handleChange}
+              required
+            />
+          </div>
+              {/* Rooms, Beds, Bathrooms */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <input
+              type="number"
+              name="rooms"
+              placeholder="Latitude"
+              className="w-full p-4 rounded-full bg-gray-100 focus:bg-white shadow-md focus:shadow-lg transition-all outline-none focus:ring-2 focus:ring-indigo-500"
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="number"
+              name="beds"
+              placeholder="Longitude"
+              className="w-full p-4 rounded-full bg-gray-100 focus:bg-white shadow-md focus:shadow-lg transition-all outline-none focus:ring-2 focus:ring-indigo-500"
+              onChange={handleChange}
+              required
+            />
+            <select
+  name="availability"
+  className="w-full p-4 rounded-full bg-gray-100 focus:bg-white shadow-md focus:shadow-lg transition-all outline-none focus:ring-2 focus:ring-indigo-500 appearance-none text-gray-400"
+  onChange={handleChange}
+  required
+>
+  <option value="" disabled selected className="text-gray-600">Availibility</option>
+  <option value="Available" className="text-gray-800">Available</option>
+  <option value="Unavailable" className="text-gray-800">Unavailable</option>
+</select>
+
+          </div>
+
+
+          {/* Image Upload */}
+          <div className="p-6 bg-indigo-50 rounded-xl shadow-md">
+            <label className="block text-indigo-800 font-semibold mb-2">
+              Upload Images 📸
+            </label>
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              className="w-full p-3 bg-white rounded-lg shadow-md focus:ring-2 focus:ring-indigo-500 transition-all cursor-pointer"
+              onChange={handleImageChange}
+              required
+            />
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="w-full p-4 bg-indigo-800 text-white rounded-full hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105 disabled:bg-gray-400"
+            disabled={loading}
+          >
+            {loading ? "Submitting..." : "Submit Listing"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
 
-export  default  ListingForm ;
+export default ListingForm;
