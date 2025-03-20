@@ -63,6 +63,8 @@ const createRazorpayPayment = TryCatch(async (req, res, next) => {
 // Create PayPal Payment
 const createPayPalPayment = TryCatch(async (req, res, next) => {
   const { amount, currency, description } = req.body; // amount in USD
+  console.log(amount, currency, description);
+
   if (!amount) {
     return next(new ErrorHandler(400, "Amount is required"));
   }
@@ -86,6 +88,7 @@ const createPayPalPayment = TryCatch(async (req, res, next) => {
       },
     ],
   };
+  console.log("Payment JSON:", paymentJson);
 
   paypal.payment.create(paymentJson, function (error, payment) {
     if (error) {
@@ -133,6 +136,10 @@ const verifyRazorpayPayment = TryCatch(async (req, res, next) => {
 
 const verifyPaymentSuccess = TryCatch(async (req, res, next) => {
   const { paymentId, PayerID } = req.query;
+
+  if (!paymentId || !PayerID) {
+    return next(new ErrorHandler(400, "Payment ID and Payer ID are required"));
+  }
   const execute_payment_json = {
     payer_id: PayerID,
   };

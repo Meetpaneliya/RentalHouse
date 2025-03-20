@@ -16,6 +16,8 @@
     "@mantine/hooks": "^7.17.1",
     "@material-tailwind/react": "^2.1.10",
     "@reduxjs/toolkit": "^2.6.1",
+    "@stripe/react-stripe-js": "^3.5.1",
+    "@stripe/stripe-js": "^6.1.0",
     "@types/react-datepicker": "^6.2.0",
     "axios": "^1.8.2",
     "leaflet": "^1.9.4",

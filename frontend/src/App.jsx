@@ -17,7 +17,9 @@ import { useMyprofileQuery } from "./redux/APi/api";
 import ForgotPassword from "./components/auth/ForgotPasswordForm";
 import ResetPassword from "./components/auth/ResetPasswordForm";
 import FAQSection from "./pages/FAQSection";
-
+import PaymentFormStripe from "./components/payments/PaymentFormStripe";
+import StripeProvider from "./components/payments/StripeProvider";
+import PaymentPage from "./components/payments/PaymentPage";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.auth);
@@ -75,15 +77,20 @@ function App() {
 
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
-          <Route path="/faq" element={<FAQSection/>}/>
+          <Route path="/faq" element={<FAQSection />} />
+          <Route
+            path="/payment/stripe"
+            element={
+              <StripeProvider>
+                <PaymentFormStripe />{" "}
+              </StripeProvider>
+            }
+          />
+          <Route path="/payment" element={<PaymentPage />} />
 
-          
           <Route path="/forget-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/profile" element={() => <Profile />} />
-
-      
-          
         </Routes>
 
         {/* Modal Overlays */}
