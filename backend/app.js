@@ -213,7 +213,7 @@ import userRoutes from "./routes/userRoutes.js";
 import listingRoutes from "./routes/listingRoutes.js";
 import favoriteRoutes from "./routes/favoriteRoutes.js"; // ✅ Fixed Spelling
 import reviewRoutes from "./routes/reviewRoutes.js";
-import adminRoutes from "./routes/Admin.js"; // ✅ Fixed Import
+import usePayment from "./routes/PaymentMethod.js"; // ✅ Fixed Import
 import { Review } from "./models/Review.js";
 import kycRoutes from "./routes/kycRoutes.js";
 // Error Middleware
@@ -224,7 +224,6 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/listings", listingRoutes);
 app.use("/api/v1/favorites", favoriteRoutes);
 app.use("/api/v1/reviews", reviewRoutes);
-app.use("/api/v1/kyc", kycRoutes);
 
 // Default Route
 app.get("/", (req, res) => {
