@@ -20,7 +20,7 @@ const ListingForm = () => {
 
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message ] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -73,7 +73,7 @@ const ListingForm = () => {
       className="flex justify-center items-center min-h-screen bg-cover bg-center bg-no-repeat px-4 py-10"
       style={{ backgroundImage: "url('/assets/room1.jpg')" }} // Replace with your actual image path
     >
-      <div className="w-full max-w-4xl bg-white shadow-2xl rounded-3xl p-10 backdrop-blur-md bg-opacity-80 transition-all duration-300">
+      <div className="w-full max-w-4xl bg shadow-2xl rounded-3xl p-10 backdrop-blur-md bg-opacity-80 transition-all duration-300">
         {/* Title */}
         <h2 className="text-4xl font-extrabold text-center text-indigo-800 mb-6">
           Add Your Rooms 🏠
