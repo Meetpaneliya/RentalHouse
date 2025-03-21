@@ -9,7 +9,19 @@ configDotenv();
 
 const createApplication = TryCatch(async (req, res, next) => {
   // Extract common fields from req.body
-  const { verificationType, ssn, passportNumber } = req.body;
+  const {
+    verificationType,
+    ssn,
+    passport, // passport here is used as passportNumber
+    address,
+    city,
+    firstName,
+    lastName,
+    middleName,
+    phoneNumber,
+    zipCode,
+  } = req.body;
+
   const userId = req.user; // ensure req.user is set by auth middleware
 
   if (!userId) {
@@ -35,14 +47,19 @@ const createApplication = TryCatch(async (req, res, next) => {
         new ErrorHandler(400, "SSN is required for SSN verification")
       );
     }
-
     // Create the KYC record for SSN verification.
     const kyc = await KYC.create({
       user: userId,
       verificationType,
       ssn,
+      firstName,
+      lastName,
+      middleName,
+      phoneNumber,
+      address,
+      city,
+      zipCode,
     });
-
     return res
       .status(201)
       .json({ success: true, message: "KYC submitted successfully", kyc });
@@ -50,7 +67,7 @@ const createApplication = TryCatch(async (req, res, next) => {
 
   // For Passport verification: ensure passportNumber and file uploads are provided.
   if (verificationType === "passport") {
-    if (!passportNumber) {
+    if (!passport) {
       return next(new ErrorHandler(400, "Passport number is required"));
     }
 
@@ -77,9 +94,16 @@ const createApplication = TryCatch(async (req, res, next) => {
     const kyc = await KYC.create({
       user: userId,
       verificationType,
-      passportNumber,
+      passportNumber: passport, // using the "passport" field as the passport number
       passportDocument: passportDocumentURL,
       visaDocument: visaDocumentURL,
+      firstName,
+      lastName,
+      middleName,
+      phoneNumber,
+      address,
+      city,
+      zipCode,
     });
 
     return res

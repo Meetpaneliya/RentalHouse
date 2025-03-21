@@ -215,7 +215,7 @@ import favoriteRoutes from "./routes/favoriteRoutes.js"; // ✅ Fixed Spelling
 import reviewRoutes from "./routes/reviewRoutes.js";
 import adminRoutes from "./routes/Admin.js"; // ✅ Fixed Import
 import { Review } from "./models/Review.js";
-
+import kycRoutes from "./routes/kycRoutes.js";
 // Error Middleware
 app.use(errorMiddleware);
 
@@ -224,7 +224,7 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/listings", listingRoutes);
 app.use("/api/v1/favorites", favoriteRoutes);
 app.use("/api/v1/reviews", reviewRoutes);
-app.use("/api/v1/admin", adminRoutes);
+app.use("/api/v1/kyc", kycRoutes);
 
 // Default Route
 app.get("/", (req, res) => {
@@ -241,7 +241,7 @@ app.all("*", (req, res) => {
 
 // Start Server
 app.listen(port, () => {
-  console.log(`Server running on Port: ${port} in ${envMode} Mode.`)
+  console.log(`Server running on Port: ${port} in ${envMode} Mode.`);
 });
 
 // Handle Uncaught Errors & Promise Rejections
@@ -253,9 +253,6 @@ process.on("uncaughtException", (err) => {
 process.on("unhandledRejection", (err) => {
   console.error(` Unhandled Promise Rejection: ${err.message}`);
 });
-
-
-
 
 // import express from "express";
 // import helmet from "helmet";

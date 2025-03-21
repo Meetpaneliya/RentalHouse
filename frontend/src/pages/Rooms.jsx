@@ -6,6 +6,7 @@ import { FaWifi, FaTv, FaSnowflake, FaShower, FaStar } from "react-icons/fa";
 import Footer from "../components/Footer";
 import { Dialog } from "@headlessui/react";
 import { FaShareSquare } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom';
 
 const Rooms = () => {
   const { id } = useParams();
@@ -17,6 +18,12 @@ const Rooms = () => {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [setSuccessMessage] = useState("");
+
+  const navigate = useNavigate();
+
+  const handleNavigate = () => {
+    navigate('/KYC'); // Navigate to /KYC
+};
 
   useEffect(() => {
     const fetchRoomDetails = async () => {
@@ -190,7 +197,7 @@ const Rooms = () => {
               <div className="mt-2 text-lg font-bold text-blue-800">
                 Total: ${room.price - Math.floor(room.price * 0.1) + Math.floor(room.price * 0.05)}
               </div>
-              <button className="mt-4 w-full px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Reserve</button>
+              <button onClick={handleNavigate} className="mt-4 w-full px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Reserve</button>
               <p className="text-gray-500 text-sm text-center mt-2">You won't get charged yet</p>
             </div>
           </div>

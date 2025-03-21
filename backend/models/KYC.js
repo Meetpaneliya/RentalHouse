@@ -7,28 +7,45 @@ const KYCSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-
     verificationType: {
       type: String,
       enum: ["ssn", "passport"],
       required: true,
     },
-
     ssn: {
       type: String,
     },
     // For Passport verification
     passportNumber: {
       type: String,
-      // required only if verificationType is "passport"
     },
     passportDocument: {
       type: String,
-      // URL for uploaded passport document
     },
     visaDocument: {
       type: String,
-      // URL for uploaded visa document (required if passport is chosen)
+    },
+    // Additional personal information fields
+    firstName: {
+      type: String,
+    },
+    lastName: {
+      type: String,
+    },
+    middleName: {
+      type: String,
+    },
+    phoneNumber: {
+      type: String,
+    },
+    address: {
+      type: String,
+    },
+    city: {
+      type: String,
+    },
+    zipCode: {
+      type: String,
     },
     // KYC status: pending, approved, or rejected
     status: {

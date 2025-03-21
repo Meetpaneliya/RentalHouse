@@ -20,10 +20,18 @@ const ListingForm = () => {
 
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [message ] = useState("");
+  const [message] = useState("");
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, type } = e.target;
+
+    // Convert number inputs properly
+    const finalValue = type === "number" ? parseFloat(value) || "" : value;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: finalValue,
+    }));
   };
 
   const handleImageChange = (e) => {
@@ -145,14 +153,18 @@ const ListingForm = () => {
 
           {/* Property Type & Amenities */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <input
-              type="text"
+            <select
               name="propertyType"
-              placeholder="Property Type"
-              className="w-full p-4 rounded-full bg-gray-100 focus:bg-white shadow-md focus:shadow-lg transition-all outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full p-4 rounded-full bg-gray-100 focus:bg-white shadow-md focus:shadow-lg transition-all outline-none focus:ring-2 focus:ring-indigo-500 appearance-none text-gray-400"
               onChange={handleChange}
+              value={formData.propertyType || ""}
               required
-            />
+            >
+              <option value="" disabled className="text-gray-600">Select Property Type</option>
+              <option value="apartment" className="text-gray-800">apartment</option>
+              <option value="hotel" className="text-gray-800">hotel</option>
+            </select>
+
             <input
               type="text"
               name="amenities"
@@ -189,34 +201,38 @@ const ListingForm = () => {
               required
             />
           </div>
-              {/* Rooms, Beds, Bathrooms */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+
+          {/*  */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <input
               type="number"
-              name="rooms"
+              name="lat"
               placeholder="Latitude"
+              step="any"  // Allows floating numbers
               className="w-full p-4 rounded-full bg-gray-100 focus:bg-white shadow-md focus:shadow-lg transition-all outline-none focus:ring-2 focus:ring-indigo-500"
               onChange={handleChange}
               required
             />
             <input
               type="number"
-              name="beds"
+              name="lng"
               placeholder="Longitude"
+              step="any"  // Allows floating numbers
               className="w-full p-4 rounded-full bg-gray-100 focus:bg-white shadow-md focus:shadow-lg transition-all outline-none focus:ring-2 focus:ring-indigo-500"
               onChange={handleChange}
               required
             />
+
             <select
-  name="availability"
-  className="w-full p-4 rounded-full bg-gray-100 focus:bg-white shadow-md focus:shadow-lg transition-all outline-none focus:ring-2 focus:ring-indigo-500 appearance-none text-gray-400"
-  onChange={handleChange}
-  required
->
-  <option value="" disabled selected className="text-gray-600">Availibility</option>
-  <option value="Available" className="text-gray-800">Available</option>
-  <option value="Unavailable" className="text-gray-800">Unavailable</option>
-</select>
+              name="availability"
+              className="w-full p-4 rounded-full bg-gray-100 focus:bg-white shadow-md focus:shadow-lg transition-all outline-none focus:ring-2 focus:ring-indigo-500 appearance-none text-gray-400"
+              onChange={handleChange}
+              required
+            >
+              <option value="" disabled selected className="text-gray-600">Availibility</option>
+              <option value="Available" className="text-gray-800">Available</option>
+              <option value="Unavailable" className="text-gray-800">Unavailable</option>
+            </select>
 
           </div>
 
@@ -244,6 +260,7 @@ const ListingForm = () => {
           >
             {loading ? "Submitting..." : "Submit Listing"}
           </button>
+
         </form>
       </div>
     </div>

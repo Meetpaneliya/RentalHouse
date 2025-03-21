@@ -7,28 +7,26 @@ import { toast } from "react-toastify";
 import { useLogoutuserMutation } from "../redux/APi/api";
 import "react-toastify/dist/ReactToastify.css";
 
-
 const Navbar = ({ setShowLoginModal, setShowSignupModal }) => {
-
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isAuthenticated, user } = useSelector((state) => state.auth);
-  
+
   const [logoutUser, { isLoading: isloggingOut }] = useLogoutuserMutation();
 
   const handleLogout = async () => {
     try {
       await logoutUser().unwrap();
       dispatch(logout());
-      toast.success("Logout Successfully.")
+      toast.success("Logout Successfully.");
       navigate("/");
+      window.location.reload();
     } catch (error) {
       console.error("Logout error:", error);
       toast.error("Failed to log out.");
     }
   };
-
 
   return (
     <header className="bg-transparent text-white shadow-md">

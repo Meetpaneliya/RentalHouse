@@ -17,7 +17,10 @@ import { useMyprofileQuery } from "./redux/APi/api";
 import ForgotPassword from "./components/auth/ForgotPasswordForm";
 import ResetPassword from "./components/auth/ResetPasswordForm";
 import FAQSection from "./pages/FAQSection";
-
+import MultiStepKYCForm1 from "./components/kyc/MultiStepKYCForm1";
+import MultiStepKYCForm2 from "./components/kyc/MultiStepKYCForm2";
+import KYC from "./pages/KYC";
+import { toast } from "react-toastify";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.auth);
@@ -75,15 +78,15 @@ function App() {
 
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
-          <Route path="/faq" element={<FAQSection/>}/>
+          <Route path="/faq" element={<FAQSection />} />
 
-          
           <Route path="/forget-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/profile" element={() => <Profile />} />
 
-      
-          
+          <Route path="/KYC" element={<KYC />} />
+          <Route path="/MultiStepKYCForm1" element={<MultiStepKYCForm1 />} />
+          <Route path="/MultiStepKYCForm2" element={<MultiStepKYCForm2 />} />
         </Routes>
 
         {/* Modal Overlays */}
