@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { CreditCard, DollarSign } from "lucide-react";
 
-const PaymentFormPaypal = ({ amount }) => {
+const PaymentFormPaypal = ({ room }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -11,14 +11,15 @@ const PaymentFormPaypal = ({ amount }) => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_SERVER}/api/v1/payments/paypal`,
+        `${import.meta.env.VITE_SERVER}/api/v1/payments/stripe`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            amount,
+            amount: room.price,
             currency: "USD",
-            description: "Room Booking Payment",
+            room: room._id,
+            gateway: "paypal",
           }),
           credentials: "include",
         }
@@ -83,7 +84,7 @@ const PaymentFormPaypal = ({ amount }) => {
           ) : (
             <>
               <DollarSign className="w-5 h-5 mr-2" />
-              Pay ${amount}
+              Pay ${room.price}
             </>
           )}
         </button>

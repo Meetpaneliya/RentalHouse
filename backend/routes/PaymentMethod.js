@@ -3,9 +3,9 @@ import express from "express";
 
 import { protect } from "../middlewares/auth.js";
 import {
+  createPayment,
   createPayPalPayment,
   createRazorpayPayment,
-  createStripePayment,
   verifyPaymentCancel,
   verifyPaymentSuccess,
   verifyRazorpayPayment,
@@ -14,7 +14,7 @@ import {
 const router = express.Router();
 
 // Create Payment Intent - Protected route so only authenticated users can pay
-router.post("/stripe", protect, createStripePayment);
+router.post("/stripe", protect, createPayment);
 router.post("/razorpay", protect, createRazorpayPayment);
 router.post("/razorpay/verify", protect, verifyRazorpayPayment);
 router.post("/paypal", protect, createPayPalPayment);

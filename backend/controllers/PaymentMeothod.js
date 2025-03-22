@@ -5,7 +5,9 @@ import { config } from "dotenv";
 import paypal from "paypal-rest-sdk";
 import ErrorHandler from "../utils/errorHandler.js";
 import { validateWebhookSignature } from "razorpay/dist/utils/razorpay-utils.js";
-
+import Payment from "../models/Order.js";
+import { User } from "../models/user.js";
+import { Listing } from "../models/listing.js";
 config(); // Load environment variables
 
 // Stripe instance
@@ -25,20 +27,106 @@ paypal.configure({
 });
 
 // Create Stripe Payment Intent
-const createStripePayment = TryCatch(async (req, res, next) => {
-  const { amount, currency } = req.body; // amount in cents
-  if (!amount) {
-    return next(new ErrorHandler(400, "Amount is required"));
+const createPayment = TryCatch(async (req, res, next) => {
+  const { gateway, room, amount, currency } = req.body;
+  console.log(gateway, room, amount, currency);
+  // Validate required fields
+  if (!gateway || !room || !amount) {
+    return next(new ErrorHandler(400, "Missing required payment details"));
   }
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount, // amount should be in cents
-    currency: currency || "usd",
-    payment_method_types: ["card"],
-  });
-  res.status(200).json({
-    success: true,
-    clientSecret: paymentIntent.client_secret,
-  });
+
+  switch (gateway) {
+    case "stripe":
+      // Call your createStripePayment logic
+      const stripeSession = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        mode: "payment",
+        success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.FRONTEND_URL}/cancel`,
+        customer_email: req.user.email,
+        line_items: [
+          {
+            price_data: {
+              currency: currency || "usd",
+              product_data: {
+                name: "Booking for Room",
+              },
+              unit_amount: amount * 100,
+            },
+            quantity: 1,
+          },
+        ],
+        metadata: {
+          buyerId: req.user._id.toString(),
+          roomId: room.toString(),
+        },
+      });
+      // Save your payment record if needed...
+      return res.status(200).json({
+        success: true,
+        sessionId: stripeSession.id, // or use session.id if you handle redirection client-side
+        redirectUrl: stripeSession.url, // or use session.id if you handle redirection client-side
+      });
+
+    case "razorpay":
+      // Create a Razorpay order
+      const options = {
+        amount: Math.round(amount * 100), // in paisa
+        currency: currency || "INR",
+        receipt: room._id,
+      };
+      const razorpayOrder = await razorpay.orders.create(options);
+      console.log(razorpayOrder);
+      return res.status(200).json({
+        success: true,
+        orderId: razorpayOrder.id,
+        // Pass additional details needed for the frontend checkout widget
+      });
+
+    case "paypal":
+      // Create a PayPal payment
+      const paymentJson = {
+        intent: "sale",
+        payer: { payment_method: "paypal" },
+        redirect_urls: {
+          return_url: `${process.env.BASE_URL}/payment/paypal/success`,
+          cancel_url: `${process.env.BASE_URL}/payment/paypal/cancel`,
+        },
+        transactions: [
+          {
+            amount: {
+              currency: currency || "USD",
+              total: amount.toString(),
+            },
+            description: "Payment description",
+          },
+        ],
+      };
+      paypal.payment.create(paymentJson, function (error, payment) {
+        if (error) {
+          return next(new ErrorHandler(500, error.response));
+        } else {
+          let approvalUrl = "";
+          payment.links.forEach((link) => {
+            if (link.rel === "approval_url") {
+              approvalUrl = link.href;
+            }
+          });
+          if (approvalUrl) {
+            return res.status(200).json({
+              success: true,
+              redirectUrl: approvalUrl,
+            });
+          } else {
+            return next(new ErrorHandler(500, "Approval URL not found"));
+          }
+        }
+      });
+      break;
+
+    default:
+      return next(new ErrorHandler(400, "Unsupported payment gateway"));
+  }
 });
 
 // Create Razorpay Payment Order
@@ -120,12 +208,19 @@ const createPayPalPayment = TryCatch(async (req, res, next) => {
 
 const verifyRazorpayPayment = TryCatch(async (req, res, next) => {
   const { orderId, paymentId, signature } = req.body;
+  console.log(orderId, paymentId, signature);
+  if (!orderId || !paymentId || !signature) {
+    return next(
+      new ErrorHandler(400, "Missing required fields for verification")
+    );
+  }
 
-  const secret = process.env.RAZOR_SECRET;
-  const body = orderId + "|" + paymentId;
-  const isValidSignature = validateWebhookSignature(body, signature, secret);
+  const expectedSignature = crypto
+    .createHmac("sha256", process.env.RAZOR_SECRET)
+    .update(`${orderId}|${paymentId}`)
+    .digest("hex");
 
-  if (isValidSignature) {
+  if (expectedSignature === signature) {
     console.log("Razorpay Payment Verification Success");
     return res.status(200).json({ success: true, message: "Payment verified" });
   } else {
@@ -168,7 +263,7 @@ const verifyPaymentCancel = TryCatch(async (req, res, next) => {
 });
 
 export {
-  createStripePayment,
+  createPayment,
   createRazorpayPayment,
   createPayPalPayment,
   verifyPaymentSuccess,

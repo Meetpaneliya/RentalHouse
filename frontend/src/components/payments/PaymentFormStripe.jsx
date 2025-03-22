@@ -1,10 +1,10 @@
-import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { CreditCard, Lock, Shield, Clock, CheckCircle } from "lucide-react";
+import { useStripe } from "@stripe/react-stripe-js";
+import { CreditCard, Lock, Shield, Clock } from "lucide-react";
 import { useState } from "react";
+import { server } from "../../lib/config";
 
-const PaymentForm = ({ amount, currency = "usd" }) => {
+const PaymentForm = ({ amount, currency = "usd", room }) => {
   const stripe = useStripe();
-  const elements = useElements();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -13,51 +13,37 @@ const PaymentForm = ({ amount, currency = "usd" }) => {
     setLoading(true);
     setMessage("");
 
-    if (!stripe || !elements) {
+    if (!stripe) {
       setMessage("Stripe is not ready yet. Please try again later.");
       setLoading(false);
       return;
     }
 
-    const cardElement = elements.getElement(CardElement);
-    if (!cardElement) {
-      setMessage("Card details are missing.");
-      setLoading(false);
-      return;
-    }
-
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER}/api/v1/payments/stripe`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount, currency }),
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`${server}/api/v1/payments/stripe`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount,
+          currency,
+          room: room._id,
+          gateway: "stripe",
+        }),
+        credentials: "include",
+      });
 
-      const { clientSecret } = await response.json();
+      const sessionData = await response.json();
 
-      if (!clientSecret) {
-        setMessage("Failed to initiate payment. Try again.");
-        setLoading(false);
-        return;
-      }
+      // Redirect to Stripe Checkout using the sessionId from your backend.
+      const result = await stripe.redirectToCheckout({
+        sessionId: sessionData.sessionId,
+      });
 
-      const { error, paymentIntent } = await stripe.confirmCardPayment(
-        clientSecret,
-        {
-          payment_method: { card: cardElement },
-        }
-      );
-
-      if (error) {
-        setMessage(error.message);
-      } else if (paymentIntent.status === "succeeded") {
-        setMessage("🎉 Payment successful!");
+      if (result.error) {
+        setMessage(result.error.message);
       }
     } catch (err) {
+      console.error(err);
       setMessage("Payment failed. Please try again.");
     }
 
@@ -77,7 +63,9 @@ const PaymentForm = ({ amount, currency = "usd" }) => {
               <h2 className="text-xl font-semibold text-gray-800">
                 Secure Payment
               </h2>
-              <p className="text-sm text-gray-500">Protected by Stripe</p>
+              <p className="text-sm text-gray-500">
+                Protected by Stripe Checkout
+              </p>
             </div>
           </div>
           <img
@@ -102,32 +90,11 @@ const PaymentForm = ({ amount, currency = "usd" }) => {
 
         {/* Payment Form */}
         <form onSubmit={handlePayment} className="space-y-6">
-          <div className="rounded-lg border border-gray-200 p-4 bg-white">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Card Information
-            </label>
-            <CardElement
-              options={{
-                style: {
-                  base: {
-                    fontSize: "16px",
-                    color: "#424770",
-                    "::placeholder": {
-                      color: "#aab7c4",
-                    },
-                    padding: "10px 0",
-                  },
-                  invalid: {
-                    color: "#9e2146",
-                  },
-                },
-              }}
-            />
-          </div>
+          {/* Since Stripe Checkout handles card collection, no card fields are needed here */}
 
           <button
             type="submit"
-            disabled={!stripe || loading}
+            disabled={loading || !stripe}
             className={`w-full flex items-center justify-center px-4 py-3 rounded-lg text-white font-medium transition-all duration-200 ${
               loading || !stripe
                 ? "bg-indigo-400 cursor-not-allowed"

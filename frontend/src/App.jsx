@@ -17,6 +17,9 @@ import { useMyprofileQuery } from "./redux/APi/api";
 import ForgotPassword from "./components/auth/ForgotPasswordForm";
 import ResetPassword from "./components/auth/ResetPasswordForm";
 import FAQSection from "./pages/FAQSection";
+import PaymentPage from "./components/payments/PaymentPage";
+import PaymentCancel from "./components/payments/PaymentCancel";
+import PaymentSuccess from "./components/payments/PaymentSuccess";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.auth);
@@ -75,6 +78,9 @@ function App() {
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/faq" element={<FAQSection />} />
+          <Route path="/payment" element={<PaymentPage />} />
+          <Route path="/success" element={<PaymentSuccess />} />
+          <Route path="/cancel" element={<PaymentCancel />} />
 
           <Route path="/forget-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />

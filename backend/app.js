@@ -8,7 +8,7 @@ import { connectDB } from "./lib/db.js";
 import { errorMiddleware } from "./middlewares/error.js";
 import * as AdminJSMongoose from "@adminjs/mongoose";
 import cookieParser from "cookie-parser";
-
+import session from "express-session";
 // Import Models FIRST
 import { User } from "./models/user.js";
 import { Listing } from "./models/listing.js";
@@ -21,6 +21,34 @@ import AdminJSExpress from "@adminjs/express";
 // Load environment variables
 dotenv.config({ path: "./.env" });
 const app = express();
+
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+  })
+);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+// CORS Configuration
+const corsOptions = {
+  origin: "http://localhost:5173",
+  credentials: true,
+};
+app.use(cors(corsOptions));
+app.use(morgan("dev"));
+const sessionOptions = {
+  secret: process.env.SESSION_SECRET || "your-secret",
+  resave: false, // ✅ Explicitly set resave
+  saveUninitialized: false, // ✅ Explicitly set saveUninitialized
+  cookie: {
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60 * 24, // 1 day expiration
+  },
+};
 
 // Register AdminJS adapter for Mongoose
 AdminJS.registerAdapter({
@@ -167,11 +195,16 @@ const authenticate = async (email, password) => {
   }
   return null;
 };
-const adminRouter = AdminJSExpress.buildAuthenticatedRouter(admin, {
-  authenticate,
-  cookieName: "adminjs",
-  cookiePassword: process.env.ADMIN_COOKIE_SECRET || "your-secret",
-});
+const adminRouter = AdminJSExpress.buildAuthenticatedRouter(
+  admin,
+  {
+    authenticate,
+    cookieName: "adminjs",
+    cookiePassword: process.env.ADMIN_COOKIE_SECRET || "your-secret",
+  },
+  null,
+  sessionOptions
+);
 app.use(admin.options.rootPath, adminRouter);
 
 // Application setup
@@ -190,23 +223,6 @@ cloudinary.config({
 });
 
 // Security & Middleware Setup
-app.use(
-  helmet({
-    contentSecurityPolicy: false,
-    crossOriginEmbedderPolicy: false,
-  })
-);
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-
-// CORS Configuration
-const corsOptions = {
-  origin: "http://localhost:5173",
-  credentials: true,
-};
-app.use(cors(corsOptions));
-app.use(morgan("dev"));
 
 // Import API Routes
 import userRoutes from "./routes/userRoutes.js";
@@ -224,6 +240,8 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/listings", listingRoutes);
 app.use("/api/v1/favorites", favoriteRoutes);
 app.use("/api/v1/reviews", reviewRoutes);
+app.use("/api/v1/payments", usePayment);
+app.use("/api/v1/kyc", kycRoutes);
 
 // Default Route
 app.get("/", (req, res) => {

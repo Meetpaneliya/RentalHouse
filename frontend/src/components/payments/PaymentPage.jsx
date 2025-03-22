@@ -17,10 +17,13 @@ import {
   Calendar,
 } from "lucide-react";
 import StripeProvider from "./StripeProvider";
+import { useMemo } from "react";
+import { useSelector } from "react-redux";
 
 const PaymentPage = () => {
-  const location = useLocation();
-  const { amount, currency, room } = location.state;
+  const orders = useSelector((state) => state.order.orders);
+  const room = orders.length ? orders[orders.length - 1] : null;
+
   const [selectedMethod, setSelectedMethod] = useState(null);
 
   const paymentMethods = [
@@ -70,7 +73,7 @@ const PaymentPage = () => {
               <div className="grid grid-cols-2 gap-4 mb-6">
                 {room.images.map((image, index) => (
                   <img
-                    key={index}
+                    key={image._id}
                     src={image.url}
                     alt={`Room view ${index + 1}`}
                     className="rounded-lg w-full h-48 object-cover"
@@ -219,14 +222,14 @@ const PaymentPage = () => {
               <div className="mt-8">
                 {selectedMethod === "stripe" && (
                   <StripeProvider>
-                    <PaymentFormStripe amount={room.price} />
+                    <PaymentFormStripe amount={room.price} room={room} />
                   </StripeProvider>
                 )}
                 {selectedMethod === "razorpay" && (
                   <PaymentFormRazorpay amount={room.price} room={room} />
                 )}
                 {selectedMethod === "paypal" && (
-                  <PaymentFormPaypal amount={room.price} />
+                  <PaymentFormPaypal amount={room.price} room={room} />
                 )}
               </div>
             </div>
